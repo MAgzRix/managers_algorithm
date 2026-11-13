@@ -1,0 +1,133 @@
+flowchart TD
+  %% Схема синхронизирована с tree-data.js · 43 узлов
+  start(["Обращение клиента"])
+  client_type{{"1. Принять обращение · новый или действующий клиент?"}}
+  existing_need{{"Действующий клиент · контекст и текущий запрос"}}
+  handoff_existing[/"Передать проблему по текущему продукту"/]
+  step2_needs{{"2. Выявить потребность и подтвердить задачу"}}
+  step3_channel{{"3. Какой канал нужен?"}}
+  step3_wa_route{{"Как клиент подключает WhatsApp?"}}
+  step3_wa_route_both{{"Выберите маршрут WhatsApp"}}
+  route_sms{{"SMS · выберите тип трафика"}}
+  sms_international["SMS · другие страны · только платный Sender ID"]
+  sms_mixed["SMS · Казахстан и другие страны · разделить правила"]
+  sms_sender{{"SMS · выбрать имя отправителя"}}
+  sms_alpha_name["SMS · Казахстан · заявка на альфа-имя"]
+  sms_shared_header["SMS · Казахстан · общий заголовок"]
+  sms_delivery_method{{"SMS · кабинет или интеграция?"}}
+  sms_account_route["SMS · личный кабинет"]
+  sms_api_route["SMS · подготовить интеграцию"]
+  sms_route_continue{{"SMS-квалификация завершена"}}
+  route_flowzap["Маршрут: FlowZap"]
+  route_iwabakit["Маршрут: iWabaKiT"]
+  route_flowzap_both["Маршрут: SMS + FlowZap"]
+  route_iwabakit_both["Маршрут: SMS + iWabaKiT"]
+  handoff_route(["WhatsApp · QR или нестандартный сценарий"])
+  test_access_decision{{"5. Тест и договор · нужен тестовый доступ?"}}
+  contract_details["Договор · реквизиты и ответственные"]
+  step6_connect["6. Подключить, передать инструкцию и проверить"]
+  verification{{"Проверка подключения прошла?"}}
+  handoff_technical[/"Передать техническую ошибку"/]
+  end_success(["7. Активация, контроль и завершение"])
+  end_existing_handoff(["Обращение передано специалисту"])
+  end_gap(["Нет готовой инструкции · запросить маршрут"])
+  triage_new{{"С чего начал клиент?"}}
+  end_not_fit(["Не наш клиент · вежливо закрыто"])
+  qualify_lead{{"Квалификация: насколько сделка реальна?"}}
+  offer_prep["4. Предложение (КП) под сценарий"]
+  offer_reaction{{"Как клиент отреагировал на предложение?"}}
+  objection_handle["Работа с возражением"]
+  followup_offer{{"Follow-up после КП"}}
+  lost_reason(["Потеря · записать причину и дату возврата"])
+  end_nurture(["Клиент пока не готов · касания запланированы"])
+  test_plan["Тест как мини-воронка"]
+  handoff_billing[/"Передать вопрос по оплате и документам"/]
+  retention_save["Клиент недоволен или сравнивает"]
+  start --> client_type
+  client_type -->|"Новый клиент"| triage_new
+  client_type -->|"Действующий клиент"| existing_need
+  existing_need -->|"Проблема с текущим продуктом"| handoff_existing
+  existing_need -.->|"Новая услуга · к шагу 2"| step2_needs
+  existing_need -->|"Баланс, оплата, документы, акты"| handoff_billing
+  existing_need -->|"Недоволен / хочет уйти / сравнивает с другим"| retention_save
+  existing_need -->|"Другое"| end_gap
+  handoff_existing --> end_existing_handoff
+  step2_needs -->|"Да, задача понята верно · продолжить"| qualify_lead
+  step2_needs -.->|"Клиент уточнил детали · вернуться к вопросам"| step2_needs
+  step2_needs -->|"Клиент занят / пока не готов · назначить касание"| end_nurture
+  step3_channel -->|"SMS"| route_sms
+  step3_channel -->|"WhatsApp"| step3_wa_route
+  step3_channel -->|"SMS и WhatsApp"| route_sms
+  step3_channel -->|"Короткие номера"| end_gap
+  step3_channel -.->|"Потребность не определена"| step2_needs
+  step3_channel -->|"Клиент пока не готов выбирать · запланировать касания"| end_nurture
+  step3_wa_route -->|"Клиент подключает номер через кабинет"| route_flowzap
+  step3_wa_route -->|"Нужны API или серверная интеграция"| route_iwabakit
+  step3_wa_route -->|"Личный номер или QR"| handoff_route
+  step3_wa_route -->|"Сценарий не совпадает с описанием"| handoff_route
+  step3_wa_route_both -->|"Подключение через кабинет · FlowZap"| route_flowzap_both
+  step3_wa_route_both -->|"API / серверная интеграция · iWabaKiT"| route_iwabakit_both
+  step3_wa_route_both -->|"Личный номер или QR"| handoff_route
+  step3_wa_route_both -->|"Сценарий не совпадает с описанием"| handoff_route
+  route_sms -->|"Только Казахстан · локальный трафик"| sms_sender
+  route_sms -->|"Другие страны · международный трафик"| sms_international
+  route_sms -->|"Казахстан и другие страны · оба направления"| sms_mixed
+  route_sms -.->|"География пока неизвестна"| route_sms
+  sms_international --> sms_delivery_method
+  sms_mixed --> sms_delivery_method
+  sms_sender -->|"Нужен уникальный Sender ID / альфа-имя"| sms_alpha_name
+  sms_sender -->|"Подходит общий заголовок KiT_Notify / InfoSMS"| sms_shared_header
+  sms_alpha_name --> sms_delivery_method
+  sms_shared_header --> sms_delivery_method
+  sms_delivery_method -->|"Ручная отправка из SMS-кабинета"| sms_account_route
+  sms_delivery_method -->|"Автоматическая отправка · API / интеграция"| sms_api_route
+  sms_delivery_method -.->|"Способ пока не определён"| sms_delivery_method
+  sms_account_route --> sms_route_continue
+  sms_api_route --> sms_route_continue
+  sms_route_continue -->|"Дальше только по SMS"| offer_prep
+  sms_route_continue -->|"Дальше выбрать маршрут WhatsApp"| step3_wa_route_both
+  route_flowzap --> offer_prep
+  route_iwabakit --> offer_prep
+  route_flowzap_both --> offer_prep
+  route_iwabakit_both --> offer_prep
+  test_access_decision -->|"Да, нужен тест"| test_plan
+  test_access_decision -->|"Нет, продолжаем без теста"| contract_details
+  contract_details --> step6_connect
+  step6_connect --> verification
+  verification -->|"Да, тест прошёл"| end_success
+  verification -->|"Нет, есть ошибка"| handoff_technical
+  handoff_technical --> verification
+  triage_new -->|"Сразу спрашивает цену / тариф"| step2_needs
+  triage_new -->|"Знает, что нужно (готов говорить предметно)"| step2_needs
+  triage_new -->|"Общий интерес / «расскажите, что у вас есть»"| step2_needs
+  triage_new -->|"Не наш профиль (спам, не B2B, чужая страна без SMS/WhatsApp)"| end_not_fit
+  qualify_lead -->|"Горячий: 4–5 баллов · к подбору маршрута"| step3_channel
+  qualify_lead -->|"Тёплый: 2–3 балла · уточнить недостающее и продолжить"| step3_channel
+  qualify_lead -->|"Холодный: 0–1 балл / «просто смотрю»"| end_nurture
+  offer_prep --> offer_reaction
+  offer_reaction -->|"Согласен · к договору и тесту"| test_access_decision
+  offer_reaction -->|"Есть возражение (цена, сроки, доверие, конкурент)"| objection_handle
+  offer_reaction -->|"Молчит / «подумаем» / «согласуем»"| followup_offer
+  offer_reaction -->|"Отказ"| lost_reason
+  objection_handle --> offer_reaction
+  followup_offer -.->|"Клиент ответил · к реакции на КП"| offer_reaction
+  followup_offer -->|"Тишина после 4–5 касаний · закрыть с причиной"| lost_reason
+  test_plan --> contract_details
+  handoff_billing --> end_existing_handoff
+  retention_save --> end_existing_handoff
+  classDef sales fill:#e3f4ea,stroke:#218366,stroke-width:2px,color:#163b2e;
+  classDef sms fill:#fff2c6,stroke:#d3a000,stroke-width:2px,color:#4a3900;
+  classDef whatsapp fill:#dcfce7,stroke:#00a651,stroke-width:2px,color:#123b24;
+  classDef flowzap fill:#155b43,stroke:#0c4532,stroke-width:2px,color:#ffffff;
+  classDef iwaba fill:#d8f2ed,stroke:#18796d,stroke-width:2px,color:#163e39;
+  classDef combined fill:#edf6ef,stroke:#528268,stroke-width:2px,color:#1d3e2d;
+  classDef gap fill:#f1f1f6,stroke:#817caa,stroke-width:2px,color:#37334d;
+  classDef handoff fill:#eee9ff,stroke:#7666ba,stroke-width:2px,color:#30264f;
+  class end_success,triage_new,end_not_fit,qualify_lead,offer_prep,offer_reaction,objection_handle,followup_offer,lost_reason,end_nurture,test_plan,retention_save sales
+  class route_sms,sms_international,sms_mixed,sms_sender,sms_alpha_name,sms_shared_header,sms_delivery_method,sms_account_route,sms_api_route,sms_route_continue sms
+  class step3_channel,step3_wa_route whatsapp
+  class route_flowzap flowzap
+  class route_iwabakit iwaba
+  class step3_wa_route_both,route_flowzap_both,route_iwabakit_both combined
+  class end_gap gap
+  class handoff_existing,handoff_technical,handoff_billing handoff

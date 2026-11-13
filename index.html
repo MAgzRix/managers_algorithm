@@ -1,0 +1,1932 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f4">
+  <meta name="description" content="Интерактивное дерево алгоритма менеджера КазИнфоТех">
+  <title>Путеводитель менеджера — КазИнфоТех</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202925;
+      --muted: #53615b;
+      --quiet: #68756f;
+      --line: #dce4df;
+      --paper: #ffffff;
+      --canvas: #f2f5f3;
+      --deep: #202b27;
+      --green: #197b60;
+      --green-soft: #e7f3ed;
+      --amber: #895716;
+      --amber-soft: #fbf0df;
+      --blue: #2b62b7;
+      --blue-soft: #eaf1ff;
+      --purple: #604295;
+      --purple-soft: #f0eafd;
+      --orange: #8b4f16;
+      --orange-soft: #faecdc;
+      --red: #9d423a;
+      --red-soft: #f9eae8;
+      --sms: #8a6200;
+      --sms-soft: #fff5cc;
+      --whatsapp: #16852d;
+      --whatsapp-soft: #e4f8e8;
+      --flowzap: #145c3b;
+      --flowzap-soft: #e4f1e9;
+      --iwaba: #16786f;
+      --iwaba-soft: #e4f4f1;
+      --radius: 16px;
+      --shadow: 0 12px 34px rgba(29, 45, 36, .07);
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; min-height: 100%; }
+    body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 520px;
+      margin: 0;
+      overflow: hidden;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible {
+      outline: 3px solid #478d72;
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      padding: 9px 12px;
+      transform: translateY(-150%);
+      border-radius: 9px;
+      background: var(--deep);
+      color: white;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .app { display: flex; height: 100%; flex-direction: column; }
+
+    .topbar {
+      z-index: 10;
+      flex: none;
+      padding: 12px 20px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.97);
+    }
+    .top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: inline-flex; min-width: 225px; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: none;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--deep);
+      color: #d7f0e4;
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: -.04em;
+    }
+    .brand-title { display: block; font-size: 14px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+    .brand-subtitle { display: block; margin-top: 2px; color: var(--quiet); font-size: 12px; }
+    .narrow-label { display: none; }
+    .crumbs-wrap { min-width: 0; flex: 1; }
+    .crumb-caption { display: block; margin-bottom: 2px; color: var(--quiet); font-size: 12px; }
+    .breadcrumbs { display: flex; min-height: 22px; align-items: center; overflow: hidden; gap: 6px; white-space: nowrap; }
+    .crumb { overflow: hidden; color: #46534d; font-size: 13px; text-overflow: ellipsis; }
+    .crumb:last-child { color: var(--green); font-weight: 700; }
+    .crumb-separator { color: #8b9791; font-size: 12px; }
+    .header-actions { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 7px; }
+    .icon-button, .text-button {
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid #dce4df;
+      border-radius: 10px;
+      background: #fff;
+      color: #46534d;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 620;
+      white-space: nowrap;
+      transition: border .16s ease, background .16s ease, transform .16s ease;
+    }
+    .icon-button:hover, .text-button:hover { transform: translateY(-1px); border-color: #a7c7b7; background: #f8fbf9; }
+    .text-button.primary { border-color: var(--deep); background: var(--deep); color: #fff; }
+    .text-button.primary:hover { border-color: #35463e; background: #35463e; }
+    .text-button:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+    .stepbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 9px; }
+    .step-progress { display: flex; min-width: 170px; align-items: center; gap: 9px; }
+    .step-progress-label { color: #4c5b54; font-size: 12px; font-weight: 650; white-space: nowrap; }
+    .progress-track { display: flex; width: 128px; gap: 4px; }
+    .progress-segment { height: 4px; flex: 1; border-radius: 9px; background: #e4e9e6; }
+    .progress-segment.is-done { background: #8fbca6; }
+    .progress-segment.is-current { background: var(--green); }
+    .step-nav { display: flex; align-items: center; gap: 6px; }
+    .step-nav .text-button { min-height: 32px; padding: 5px 9px; }
+    .local-note { color: var(--quiet); font-size: 12px; white-space: nowrap; }
+
+    .workspace {
+      display: grid;
+      min-height: 0;
+      flex: 1;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 0;
+    }
+    .tree-panel { display: flex; min-width: 0; min-height: 0; flex-direction: column; padding: 14px 16px 12px; }
+    .tree-toolbar { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .tree-heading { display: flex; align-items: center; gap: 10px; }
+    .tree-title { margin: 0; color: #3f4d46; font-size: 13px; font-weight: 730; letter-spacing: .045em; text-transform: uppercase; }
+    .live-indicator { display: inline-flex; align-items: center; gap: 6px; color: var(--quiet); font-size: 12px; }
+    .live-indicator i { width: 7px; height: 7px; border-radius: 50%; background: #62a487; }
+    .toolbar-tools { display: flex; align-items: center; gap: 7px; }
+    .toggle-button, .zoom-button {
+      display: inline-flex;
+      min-height: 33px;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border: 1px solid #dce4df;
+      border-radius: 9px;
+      background: #fff;
+      color: #4d5b54;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 620;
+    }
+    .toggle-button[aria-pressed="true"] { border-color: #9fc1ae; background: #edf6f0; color: #28654e; }
+    .zoom-tools { display: flex; align-items: center; gap: 4px; }
+    .zoom-button { width: 32px; min-height: 32px; justify-content: center; padding: 5px; font-size: 16px; }
+    .zoom-label { min-width: 42px; color: var(--quiet); font-size: 12px; text-align: center; }
+    .tree-context {
+      display: flex;
+      flex: none;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 9px;
+      padding: 8px 10px;
+      border: 1px solid #dfe8e2;
+      border-radius: 10px;
+      background: #f8fbf9;
+      color: #536159;
+      font-size: 12px;
+    }
+    .context-icon { display: grid; width: 20px; height: 20px; flex: none; place-items: center; border-radius: 6px; background: var(--green-soft); color: #277252; font-size: 12px; font-weight: 800; }
+    .tree-viewport {
+      position: relative;
+      min-width: 0;
+      min-height: 120px;
+      flex: 1;
+      overflow: auto;
+      border: 1px solid #dfe6e1;
+      border-radius: 15px;
+      background-color: #f8faf8;
+      background-image: radial-gradient(#d8e0db .8px, transparent .8px);
+      background-position: 7px 7px;
+      background-size: 20px 20px;
+      scrollbar-color: #c2cec6 transparent;
+      scrollbar-width: thin;
+    }
+    .tree-surface { position: relative; min-width: 100%; min-height: 100%; }
+    .tree-svg { position: absolute; inset: 0 auto auto 0; overflow: visible; pointer-events: none; }
+    .edge-path { fill: none; stroke: #cbd5ce; stroke-width: 1.7; vector-effect: non-scaling-stroke; }
+    .edge-path.route-sms:not(.is-passed):not(.is-selected) { stroke: #d3a300; stroke-width: 2.3; }
+    .edge-path.route-whatsapp:not(.is-passed):not(.is-selected) { stroke: #28a442; stroke-width: 2.3; }
+    .edge-path.route-iwaba:not(.is-passed):not(.is-selected) { stroke: #219a8e; stroke-width: 2.3; }
+    .edge-path.route-flowzap:not(.is-passed):not(.is-selected) { stroke: #176344; stroke-width: 2.3; }
+    .edge-path.route-short:not(.is-passed):not(.is-selected) { stroke: #c3782e; stroke-width: 2.3; }
+    .edge-path.is-passed { stroke: #27866a; stroke-width: 3; }
+    .edge-path.is-selected { stroke: #6b9b80; stroke-width: 2.3; }
+    .edge-path.is-loop { stroke-dasharray: 5 4; }
+    .edge-label-bg { fill: #fff; stroke: #dce4df; stroke-width: 1; }
+    .edge-label-text { fill: #47574f; font: 12px Inter, ui-sans-serif, system-ui, sans-serif; }
+    .tree-node-layer { position: absolute; inset: 0 auto auto 0; }
+    .flow-node-card {
+      position: absolute;
+      display: flex;
+      width: 248px;
+      min-height: 120px;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 11px 12px 10px;
+      border: 1px solid #d7e0da;
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(34,52,43,.045);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: border .16s ease, box-shadow .16s ease, transform .16s ease, opacity .16s ease;
+    }
+    .flow-node-card:hover { z-index: 2; transform: translateY(-2px); border-color: #a9c4b4; box-shadow: 0 10px 24px rgba(34,52,43,.09); }
+    .node-head { display: flex; min-height: 25px; align-items: center; gap: 7px; }
+    .node-type-icon { display: grid; width: 24px; height: 24px; flex: none; place-items: center; border: 1px solid #dce4df; border-radius: 7px; background: #f6f8f6; color: #48574f; font-size: 13px; font-weight: 800; }
+    .type-START .node-type-icon, .type-END .node-type-icon { border-radius: 99px; background: #edf5ef; color: #28694d; }
+    .type-DECISION .node-type-icon { border-radius: 99px; background: #edf2ef; color: #455a4e; }
+    .type-SCRIPT .node-type-icon { background: #eef3ff; color: #315d9b; }
+    .type-HANDOFF .node-type-icon { background: #f1ecfb; color: #5c4690; }
+    .type-GATE .node-type-icon { background: var(--amber-soft); color: var(--amber); }
+    .type-GAP .node-type-icon { border-style: dashed; background: #fff8ee; color: var(--orange); }
+    .type-SMS .node-type-icon { background: var(--sms-soft); color: var(--sms); }
+    .node-type-label { overflow: hidden; color: #56635d; font-size: 12px; font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+    .node-status { margin-left: auto; color: #65726b; font-size: 12px; font-weight: 680; white-space: nowrap; }
+    .node-title { display: -webkit-box; overflow: hidden; margin-top: 7px; color: #26332d; font-size: 14px; font-weight: 720; letter-spacing: -.018em; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .node-summary { display: -webkit-box; overflow: hidden; margin-top: 4px; color: #5b6861; font-size: 12px; line-height: 1.38; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .node-foot { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; padding-top: 7px; }
+    .node-mini-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border: 1px solid #e1e7e3; border-radius: 6px; background: #f8faf8; color: #536159; font-size: 12px; font-weight: 630; }
+    .node-mini-badge.review { border-color: #edcf9e; background: #fff8ec; color: #775018; }
+    .node-mini-badge.gap { border-style: dashed; border-color: #dfb17c; background: #fff8ef; color: #824c18; }
+    .node-mini-badge.product-sms { border-color: #e7cf72; background: var(--sms-soft); color: #604500; }
+    .node-mini-badge.product-whatsapp { border-color: #83d895; background: var(--whatsapp-soft); color: #126328; }
+    .node-mini-badge.product-iwaba { border-color: #9bd4ca; background: var(--iwaba-soft); color: #0e5d55; }
+    .node-mini-badge.product-flowzap { border-color: #8ebba1; background: var(--flowzap-soft); color: #124d33; }
+    .node-mini-badge.product-short { border-color: #edd3b6; background: var(--orange-soft); color: var(--orange); }
+    .flow-node-card.state-current { z-index: 1; border: 2px solid #218366; box-shadow: 0 0 0 4px rgba(33,131,102,.13), 0 10px 24px rgba(33,98,73,.11); }
+    .flow-node-card.state-current .node-status { color: #17674d; }
+    .flow-node-card.state-done { border-color: #80b69c; background: #f8fcf9; }
+    .flow-node-card.state-done .node-status { color: #216c4c; }
+    .flow-node-card.state-muted { border-color: #dbe1dc; background: #f2f4f2; color: #657069; }
+    .flow-node-card.state-muted .node-title, .flow-node-card.state-muted .node-summary { color: #6b766f; }
+    .flow-node-card.state-current.type-GAP, .flow-node-card.type-GAP { border-style: dashed; border-color: #d29b5d; }
+    .flow-node-card.has-review { border-bottom-color: #d8aa65; }
+    .flow-node-card.route-sms { border-left: 5px solid var(--sms); }
+    .flow-node-card.route-whatsapp { border-left: 5px solid #21a43d; }
+    .flow-node-card.route-iwaba { border-left: 5px solid var(--iwaba); }
+    .flow-node-card.route-flowzap { border-left: 5px solid var(--flowzap); }
+    .flow-node-card.route-short { border-left: 4px solid var(--orange); }
+    .flow-node-card.route-sms .node-type-icon { background: var(--sms-soft); color: var(--sms); }
+    .flow-node-card.route-whatsapp .node-type-icon { background: var(--whatsapp-soft); color: var(--whatsapp); }
+    .flow-node-card.route-iwaba .node-type-icon { background: var(--iwaba-soft); color: var(--iwaba); }
+    .flow-node-card.route-flowzap .node-type-icon { background: var(--flowzap-soft); color: var(--flowzap); }
+    .flow-node-card.route-short .node-type-icon { background: var(--orange-soft); color: var(--orange); }
+    .flow-node-card.is-viewed:not(.state-current) { outline: 2px solid #8bb39b; outline-offset: 2px; }
+    .collapsed-node { border-style: dashed; border-color: #aebbb3; background: #f4f7f5; }
+    .collapsed-node .node-type-icon { border-style: dashed; }
+    .tree-legend { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 7px 16px; padding: 9px 2px 0; color: #58665e; font-size: 12px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .legend-dot { width: 11px; height: 11px; border: 2px solid #81978a; border-radius: 4px; background: white; }
+    .legend-dot.current { border-color: #218366; box-shadow: 0 0 0 2px #d7eee4; }
+    .legend-dot.passed { border-color: #55a27d; background: #e7f3ed; }
+    .legend-dot.gap { border-style: dashed; border-color: #c88842; }
+    .legend-dot.service-sms { border-color: #c49a00; background: var(--sms-soft); }
+    .legend-dot.service-whatsapp { border-color: #21a43d; background: var(--whatsapp-soft); }
+    .legend-dot.service-flowzap { border-color: var(--flowzap); background: var(--flowzap-soft); }
+    .legend-dot.service-iwaba { border-color: var(--iwaba); background: var(--iwaba-soft); }
+    .legend-dot.service-short { border-color: #c3782e; background: var(--orange-soft); }
+    .legend-line { width: 18px; border-top: 3px solid #27866a; }
+
+    .detail-panel {
+      --route-accent: var(--green);
+      --route-soft: var(--green-soft);
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      border-left: 1px solid var(--line);
+      background: #fff;
+    }
+    .detail-panel[data-products~="sms"] { --route-accent: var(--sms); --route-soft: var(--sms-soft); }
+    .detail-panel[data-products~="whatsapp"] { --route-accent: var(--whatsapp); --route-soft: var(--whatsapp-soft); }
+    .detail-panel[data-products~="iwaba"] { --route-accent: var(--iwaba); --route-soft: var(--iwaba-soft); }
+    .detail-panel[data-products~="flowzap"] { --route-accent: var(--flowzap); --route-soft: var(--flowzap-soft); }
+    .detail-panel[data-products~="short"] { --route-accent: var(--orange); --route-soft: var(--orange-soft); }
+    .detail-top {
+      display: flex;
+      flex: none;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 16px 18px 13px;
+      border-bottom: 4px solid var(--route-accent);
+      background: linear-gradient(110deg, var(--route-soft), #fff 75%);
+    }
+    .detail-kicker { margin-bottom: 5px; color: var(--route-accent); font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .detail-title { margin: 0; color: #24302a; font-size: 20px; font-weight: 730; letter-spacing: -.04em; line-height: 1.2; }
+    .detail-summary { margin: 6px 0 0; color: #58665e; font-size: 13px; line-height: 1.45; }
+    .detail-close { display: inline-flex; width: 34px; height: 34px; flex: none; align-items: center; justify-content: center; border: 1px solid #dfe6e1; border-radius: 9px; background: white; cursor: pointer; font-size: 17px; }
+    .detail-panel.is-closed { display: none; }
+    .workspace.details-closed { grid-template-columns: minmax(0,1fr); }
+    .detail-scroll { min-height: 0; flex: 1; overflow: auto; padding: 14px 18px 26px; scrollbar-color: #c2cec6 transparent; scrollbar-width: thin; }
+    .detail-state { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 12px; padding: 5px 8px; border: 1px solid #dce5df; border-radius: 8px; background: #f8faf8; color: #45554c; font-size: 12px; font-weight: 670; }
+    .detail-state.current { border-color: var(--route-accent); background: var(--route-soft); color: var(--route-accent); }
+    .detail-state.done { border-color: #acd2bf; background: #f1f8f4; color: #286b4d; }
+    .detail-section { margin-top: 15px; }
+    .detail-section:first-child { margin-top: 0; }
+    .detail-section-title { margin: 0 0 8px; color: #34423a; font-size: 14px; font-weight: 730; }
+    .detail-paragraph { margin: 0 0 8px; color: #4d5b53; font-size: 13px; line-height: 1.5; }
+    .manager-note-card { margin: 9px 0; padding: 10px 11px; border: 1px solid color-mix(in srgb, var(--route-accent) 30%, white); border-left: 4px solid var(--route-accent); border-radius: 10px; background: var(--route-soft); }
+    .manager-note-title { margin: 0 0 4px; color: var(--route-accent); font-size: 12px; font-weight: 800; }
+    .manager-note-text { margin: 0; color: #39463f; font-size: 12px; line-height: 1.5; }
+    .detail-list { display: grid; gap: 6px; margin: 0; padding-left: 20px; color: #4d5b53; font-size: 13px; }
+    .detail-list li { padding-left: 2px; }
+    .detail-list li::marker { color: #5b9274; }
+    .script-card {
+      margin: 8px 0;
+      padding: 12px;
+      border: 1px solid #dae4ed;
+      border-radius: 12px;
+      background: #f8fbff;
+    }
+    .script-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+    .script-title { margin: 0; color: #344b68; font-size: 13px; font-weight: 730; }
+    .copy-button {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border: 1px solid #cad7e3;
+      border-radius: 8px;
+      background: #fff;
+      color: #365371;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 670;
+      white-space: nowrap;
+    }
+    .copy-button:hover { border-color: #8faaca; background: #f3f8fc; }
+    .script-text { margin: 0; color: #425466; font-size: 13px; line-height: 1.55; white-space: pre-line; }
+    .question-list { display: grid; gap: 8px; }
+    .question-entry { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: stretch; gap: 6px; }
+    .question-item {
+      display: grid;
+      width: 100%;
+      grid-template-columns: 22px minmax(0,1fr) 20px;
+      align-items: start;
+      gap: 8px;
+      padding: 9px;
+      border: 1px solid #e1e7e3;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+    }
+    .question-item:hover { border-color: #a9c9b7; }
+    .question-item[aria-pressed="true"] { border-color: #9bc7ae; background: #f5faf6; }
+    .question-number { display: grid; width: 21px; height: 21px; place-items: center; border-radius: 6px; background: #f0f4f1; color: #53645a; font-size: 12px; font-weight: 750; }
+    .question-text strong { display: block; margin-bottom: 2px; color: #38483e; font-size: 13px; }
+    .question-text span { display: block; color: #536159; font-size: 12px; line-height: 1.45; }
+    .question-mark { width: 17px; height: 17px; margin-top: 2px; border: 1px solid #cdd7d0; border-radius: 5px; color: transparent; text-align: center; line-height: 15px; }
+    .question-item[aria-pressed="true"] .question-mark { border-color: #26775a; background: #26775a; color: #fff; }
+    .question-copy-button { align-self: center; min-height: 34px; padding: 6px 8px; border: 1px solid color-mix(in srgb, var(--route-accent) 30%, white); border-radius: 8px; background: var(--route-soft); color: var(--route-accent); cursor: pointer; font-size: 11px; font-weight: 720; }
+    .question-copy-button:hover { border-color: var(--route-accent); }
+    .question-count { margin: 0 0 8px; color: #536159; font-size: 12px; }
+    .checklist { display: grid; gap: 6px; }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 8px;
+      border: 1px solid #e8ede9;
+      border-radius: 9px;
+      background: #fff;
+      color: #4c5a52;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .check-item:hover { border-color: #b6cebf; }
+    .check-box { display: grid; width: 17px; height: 17px; flex: none; place-items: center; border: 1px solid #c7d2ca; border-radius: 5px; background: #fff; color: transparent; font-size: 12px; line-height: 1; }
+    .check-item[aria-pressed="true"] .check-box { border-color: #26775a; background: #26775a; color: #fff; }
+    .check-item[aria-pressed="true"] .check-text { color: #53645a; text-decoration: line-through; text-decoration-color: #93a99a; }
+    .flag-card { margin: 8px 0; padding: 10px 11px; border: 1px solid #edd5ab; border-radius: 10px; background: #fff9ee; color: #60451e; }
+    .flag-card.gate { border-color: #e8c88e; background: #fff8eb; }
+    .flag-card.review { border-color: #e4cfad; background: #fffaf2; }
+    .flag-card.gap { border-style: dashed; border-color: #d6a46e; background: #fff8ef; }
+    .flag-title { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; color: #60451e; font-size: 12px; font-weight: 760; }
+    .flag-text { margin: 0; color: #654f2f; font-size: 12px; line-height: 1.45; }
+    .option-list { display: grid; gap: 7px; }
+    .option-button {
+      display: flex;
+      width: 100%;
+      min-height: 43px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 10px 9px 12px;
+      border: 1px solid color-mix(in srgb, var(--route-accent) 30%, white);
+      border-radius: 10px;
+      background: linear-gradient(100deg, var(--route-soft), #fff 74%);
+      color: #2c3931;
+      cursor: pointer;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 720;
+      transition: border .15s ease, background .15s ease, transform .15s ease;
+    }
+    .option-button:hover { transform: translateX(2px); border-color: var(--route-accent); background: var(--route-soft); }
+    .option-button.is-selected { border-color: var(--route-accent); background: var(--route-soft); color: var(--route-accent); box-shadow: inset 3px 0 0 var(--route-accent); }
+    .option-arrow { flex: none; color: var(--route-accent); font-size: 18px; font-weight: 800; }
+    .option-note { margin: 0 0 8px; color: #58665e; font-size: 12px; }
+    .crm-card { padding: 11px 12px; border: 1px solid #e0e7e2; border-radius: 11px; background: #fbfcfb; }
+    .crm-lines { display: grid; gap: 4px; color: #526058; font-size: 12px; }
+    .links-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .source-link {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 11px;
+      border: 1px solid color-mix(in srgb, var(--route-accent) 32%, white);
+      border-radius: 10px;
+      background: var(--route-soft);
+      color: var(--route-accent);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 720;
+      text-decoration: none;
+    }
+    .source-link:hover { border-color: var(--route-accent); background: var(--route-soft); box-shadow: 0 3px 10px rgba(25,45,33,.08); transform: translateY(-1px); }
+    .guide-gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: 11px; margin-top: 9px; }
+    .guide-figure { min-width: 0; margin: 0; padding: 7px; border: 1px solid #e0e7e2; border-radius: 11px; background: #fff; }
+    .guide-figure a { display: block; border-radius: 7px; background: #f4f6f5; }
+    .guide-figure img { display: block; width: 100%; max-height: 320px; border-radius: 7px; object-fit: contain; }
+    .guide-figure figcaption { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-top: 7px; color: #46564d; font-size: 12px; font-weight: 620; line-height: 1.4; }
+    .guide-figure figcaption span { color: var(--route-accent); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .canvas-image-preview { position: absolute; z-index: 12; display: flex; width: min(370px, calc(100% - 24px)); max-height: min(62vh, 520px); flex-direction: column; overflow: hidden; border: 1px solid #cbd8d0; border-top: 4px solid var(--preview-accent, var(--green)); border-radius: 13px; background: #fff; box-shadow: 0 14px 34px rgba(26,42,32,.24); }
+    .canvas-image-preview[hidden] { display: none !important; }
+    .canvas-image-preview[data-products~="sms"] { --preview-accent: var(--sms); }
+    .canvas-image-preview[data-products~="whatsapp"] { --preview-accent: var(--whatsapp); }
+    .canvas-image-preview[data-products~="iwaba"] { --preview-accent: var(--iwaba); }
+    .canvas-image-preview[data-products~="flowzap"] { --preview-accent: var(--flowzap); }
+    .canvas-image-preview[data-products~="short"] { --preview-accent: var(--orange); }
+    .canvas-image-preview-head { display: flex; min-height: 43px; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 9px 10px 6px; border-bottom: 1px solid #e7ece8; }
+    .canvas-image-preview-title { overflow: hidden; margin: 0; color: #2b3931; font-size: 13px; font-weight: 760; line-height: 1.35; text-overflow: ellipsis; }
+    .canvas-image-preview-kicker { margin: 0 0 3px; color: var(--preview-accent, var(--green)); font-size: 10px; font-weight: 800; letter-spacing: .035em; text-transform: uppercase; }
+    .canvas-image-close { display: grid; width: 27px; height: 27px; flex: none; place-items: center; border: 1px solid #dce4df; border-radius: 8px; background: #fff; color: #48574f; cursor: pointer; font-size: 18px; line-height: 1; }
+    .canvas-image-close:hover { border-color: var(--preview-accent, var(--green)); color: var(--preview-accent, var(--green)); }
+    .canvas-image-pagination { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; color: #59665f; font-size: 11px; }
+    .canvas-image-controls { display: flex; gap: 5px; }
+    .canvas-image-control { min-width: 28px; min-height: 26px; padding: 3px 7px; border: 1px solid #dce4df; border-radius: 7px; background: #fff; color: #435249; cursor: pointer; font-size: 13px; }
+    .canvas-image-control:disabled { cursor: default; opacity: .4; }
+    .canvas-image-main { display: block; margin: 0 9px; overflow: hidden; border-radius: 8px; background: #f2f5f3; }
+    .canvas-image-main img { display: block; width: 100%; max-height: min(40vh, 340px); object-fit: contain; }
+    .canvas-image-caption { margin: 7px 10px; color: #45544b; font-size: 11px; font-weight: 630; line-height: 1.4; }
+    .canvas-image-thumbnails { display: flex; gap: 6px; overflow-x: auto; padding: 5px 10px 10px; scrollbar-width: thin; }
+    .canvas-image-thumb { width: 58px; height: 44px; flex: none; overflow: hidden; padding: 2px; border: 1px solid #d8e1db; border-radius: 6px; background: #f4f6f5; cursor: pointer; }
+    .canvas-image-thumb[aria-pressed="true"] { border: 2px solid var(--preview-accent, var(--green)); }
+    .canvas-image-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .canvas-image-access { display: flex; align-items: center; justify-content: space-between; gap: 9px; padding: 10px; border: 1px solid #dfe7e2; border-radius: 10px; background: #f8fbf9; color: #526057; font-size: 12px; line-height: 1.4; }
+    .canvas-image-access button { flex: none; padding: 7px 9px; border: 1px solid #9fc1ae; border-radius: 8px; background: #edf6f0; color: #28664e; cursor: pointer; font-size: 11px; font-weight: 720; }
+    .setup-route { margin: 11px 0; padding: 11px; border: 1px solid #dfe7e2; border-radius: 12px; background: #fbfcfb; }
+    .setup-route.sms { border-left: 5px solid var(--sms); }
+    .setup-route.iwaba { border-left: 5px solid var(--iwaba); }
+    .setup-route.flowzap { border-left: 5px solid var(--flowzap); }
+    .setup-route-title { margin: 0 0 8px; color: #34443b; font-size: 14px; font-weight: 750; }
+    .setup-route-note { margin: 7px 0 10px; padding: 8px 9px; border-radius: 8px; background: var(--route-soft); color: #4d5b53; font-size: 12px; line-height: 1.45; }
+    .setup-route .checklist { margin-bottom: 8px; }
+    .detail-source { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e7ece8; color: #66736c; font-size: 12px; }
+    .detail-source a { color: #276c50; font-weight: 680; text-underline-offset: 2px; }
+    .detail-footer {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+      padding: 11px 16px;
+      border-top: 1px solid #e5ebe7;
+      background: rgba(255,255,255,.98);
+    }
+    .footer-hint { max-width: 180px; color: #5c6962; font-size: 12px; }
+    .done-button {
+      display: inline-flex;
+      min-height: 39px;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--deep);
+      border-radius: 10px;
+      background: var(--deep);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .done-button:hover { border-color: #355546; background: #355546; }
+    .done-button.end { border-color: #347a5a; background: #347a5a; }
+    .done-button:disabled { cursor: not-allowed; opacity: .5; }
+    .source-badge { display: inline-flex; margin-top: 5px; padding: 3px 6px; border: 1px solid #ead6b4; border-radius: 6px; background: #fff8ec; color: #73511f; font-size: 12px; font-weight: 650; }
+
+    .mobile-edge { display: none; }
+    .drawer-backdrop {
+      position: fixed;
+      z-index: 40;
+      inset: 0;
+      display: flex;
+      justify-content: flex-end;
+      background: rgba(21,31,26,.35);
+      backdrop-filter: blur(2px);
+    }
+    .source-drawer {
+      display: flex;
+      width: min(510px, 92vw);
+      height: 100%;
+      flex-direction: column;
+      background: white;
+      box-shadow: -14px 0 40px rgba(23,36,28,.16);
+    }
+    .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px; border-bottom: 1px solid #e5ebe7; }
+    .drawer-head h2 { margin: 0; font-size: 20px; letter-spacing: -.035em; }
+    .drawer-head p { margin: 5px 0 0; color: #5b6961; font-size: 13px; }
+    .drawer-content { overflow: auto; padding: 16px 20px 28px; }
+    .drawer-group { margin-bottom: 18px; }
+    .drawer-group h3 { margin: 0 0 8px; color: #38483f; font-size: 14px; }
+    .drawer-source { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; padding: 11px; border: 1px solid #e2e8e4; border-radius: 11px; background: #fbfcfb; text-decoration: none; }
+    .drawer-source:hover { border-color: #a5c3b1; background: #f6faf7; }
+    .drawer-source strong { color: #2e6449; font-size: 13px; }
+    .drawer-source span { color: #56645c; font-size: 12px; }
+    .drawer-source em { color: #775921; font-size: 12px; font-style: normal; }
+    .drawer-note { padding: 11px 12px; border: 1px solid #ead7b7; border-radius: 10px; background: #fff9ee; color: #674c22; font-size: 12px; line-height: 1.5; }
+    .mobile-scrim { display: none; }
+    .toast {
+      position: fixed;
+      z-index: 80;
+      right: 20px;
+      bottom: 18px;
+      padding: 10px 14px;
+      transform: translateY(8px);
+      border-radius: 10px;
+      background: #263832;
+      box-shadow: 0 8px 24px rgba(22,37,29,.2);
+      color: #fff;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.is-visible { transform: translateY(0); opacity: 1; }
+    .live-region { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+    @media (max-width: 1190px) {
+      .workspace { grid-template-columns: minmax(0,1fr) 350px; }
+      .brand { min-width: 205px; }
+      .tree-panel { padding-right: 12px; padding-left: 12px; }
+      .topbar { padding-right: 14px; padding-left: 14px; }
+    }
+    @media (max-width: 980px) and (min-width: 701px) {
+      .workspace { grid-template-columns: minmax(0,1fr) 320px; }
+      .brand { min-width: 185px; }
+      .local-note { display: none; }
+      .header-actions .text-button { padding-right: 8px; padding-left: 8px; }
+      .detail-top { padding-right: 14px; padding-left: 14px; }
+      .detail-scroll { padding-right: 14px; padding-left: 14px; }
+    }
+    @media (max-width: 700px) {
+      body { height: auto; min-height: 100vh; min-height: 100dvh; overflow: auto; }
+      .app { min-height: 100vh; min-height: 100dvh; height: auto; }
+      .topbar { position: sticky; top: 0; padding: 10px 12px 9px; }
+      .top-row { align-items: flex-start; flex-wrap: wrap; gap: 9px; }
+      .brand { min-width: 0; flex: 1; }
+      .brand-mark { width: 32px; height: 32px; }
+      .brand-title { font-size: 13px; }
+      .brand-subtitle { font-size: 12px; }
+      .crumbs-wrap { order: 3; width: 100%; flex-basis: 100%; }
+      .crumb-caption { display: none; }
+      .breadcrumbs { min-height: 22px; }
+      .crumb { max-width: 130px; font-size: 12px; }
+      .header-actions { gap: 5px; }
+      .header-actions .text-button { min-height: 33px; padding: 6px 8px; font-size: 12px; }
+      #reset-button .wide-label { display: none; }
+      #reset-button .narrow-label { display: inline; }
+      .stepbar { align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+      .step-progress { min-width: 0; }
+      .progress-track { width: 82px; }
+      .step-nav { flex: 1; justify-content: flex-end; }
+      .step-nav .text-button { min-height: 31px; padding: 5px 7px; }
+      .step-nav #current-button { display: none; }
+      .local-note { display: none; }
+      .workspace { display: block; min-height: 0; }
+      .tree-panel { min-height: 0; padding: 11px 10px 15px; }
+      .tree-toolbar { align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+      .tree-title { font-size: 12px; }
+      .live-indicator { font-size: 12px; }
+      .toolbar-tools { gap: 5px; }
+      .toggle-button { min-height: 32px; padding: 5px 7px; font-size: 12px; }
+      .zoom-tools { display: none; }
+      .tree-context { font-size: 12px; }
+      .tree-viewport { min-height: 300px; max-height: none; overflow: visible; border-radius: 13px; }
+      .tree-surface { width: auto !important; min-width: 0; height: auto !important; min-height: 0; padding: 10px; }
+      .tree-svg { display: none; }
+      .tree-node-layer { position: relative; display: flex; width: 100%; flex-direction: column; gap: 0; }
+      .mobile-edge {
+        display: block;
+        padding: 6px 8px 6px 17px;
+        color: #4f6659;
+        font-size: 12px;
+        font-weight: 640;
+      }
+      .flow-node-card { position: relative; top: auto !important; left: auto !important; width: 100%; min-height: 0; padding: 11px; }
+      .node-title { font-size: 14px; }
+      .node-summary { font-size: 12px; }
+      .tree-legend { gap: 8px 12px; padding-top: 9px; }
+      .legend-item { font-size: 12px; }
+      .detail-panel {
+        position: fixed;
+        z-index: 31;
+        inset: auto 0 0;
+        width: 100%;
+        height: min(78dvh, 720px);
+        max-height: calc(100dvh - 30px);
+        transform: translateY(105%);
+        border: 1px solid #d4ded7;
+        border-bottom: 0;
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -12px 44px rgba(20,36,27,.22);
+        transition: transform .2s ease;
+      }
+      .detail-panel.is-open { transform: translateY(0); }
+      .detail-panel.is-closed { display: flex; transform: translateY(105%); }
+      .mobile-scrim {
+        position: fixed;
+        z-index: 30;
+        inset: 0;
+        display: block;
+        background: rgba(24,35,29,.3);
+      }
+      .detail-top { padding: 13px 15px 11px; }
+      .detail-close { display: inline-flex; }
+      .detail-title { font-size: 19px; }
+      .detail-scroll { padding: 12px 14px 22px; }
+      .detail-footer { padding: 10px 13px; }
+      .footer-hint { max-width: 150px; }
+      .source-drawer { width: 100%; }
+      .drawer-head, .drawer-content { padding-right: 15px; padding-left: 15px; }
+    }
+    @media (max-width: 380px) {
+      .brand-subtitle { max-width: 160px; }
+      .header-actions .text-button { gap: 5px; }
+      .header-actions #sources-button { padding-right: 7px; padding-left: 7px; }
+      .step-progress-label { font-size: 12px; }
+      .progress-track { width: 70px; }
+      .step-nav #back-button { padding-right: 6px; padding-left: 6px; }
+      .tree-context { align-items: flex-start; }
+      .footer-hint { max-width: 130px; }
+      .done-button { padding-right: 9px; padding-left: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#tree-viewport">Перейти к дереву алгоритма</a>
+  <div class="app">
+    <header class="topbar">
+      <div class="top-row">
+        <a class="brand" href="#tree-viewport" aria-label="КазИнфоТех, путеводитель менеджера">
+          <span class="brand-mark" aria-hidden="true">K</span>
+          <span><span class="brand-title">КазИнфоТех</span><span class="brand-subtitle">Путеводитель менеджера</span></span>
+        </a>
+        <div class="crumbs-wrap">
+          <span class="crumb-caption">Пройденный путь</span>
+          <nav class="breadcrumbs" id="breadcrumbs" aria-label="Пройденный путь"></nav>
+        </div>
+        <div class="header-actions">
+          <button class="text-button" id="sources-button" type="button" aria-haspopup="dialog" aria-controls="sources-drawer">
+            <span aria-hidden="true">▤</span> Источники
+          </button>
+          <button class="text-button primary" id="reset-button" type="button" title="Сбросить путь и начать новую консультацию">
+            <span aria-hidden="true">↺</span><span class="wide-label">Новая консультация</span><span class="narrow-label">Новая</span>
+          </button>
+        </div>
+      </div>
+      <div class="stepbar">
+        <div class="step-progress">
+          <span class="step-progress-label" id="progress-label" aria-live="polite">Шаг 1 из 6</span>
+          <span class="progress-track" id="progress-track" aria-hidden="true"></span>
+        </div>
+        <div class="step-nav">
+          <button class="text-button" id="back-button" type="button" disabled><span aria-hidden="true">←</span> Назад</button>
+          <button class="text-button" id="current-button" type="button"><span aria-hidden="true">◎</span> К текущему месту</button>
+        </div>
+        <span class="local-note">Путь и отметки хранятся только на этом устройстве</span>
+      </div>
+    </header>
+
+    <main class="workspace" id="main-content">
+      <section class="tree-panel" aria-label="Дерево консультации">
+        <div class="tree-toolbar">
+          <div class="tree-heading">
+            <h1 class="tree-title">Дерево консультации</h1>
+            <span class="live-indicator"><i aria-hidden="true"></i> Живой маршрут</span>
+          </div>
+          <div class="toolbar-tools">
+            <div class="zoom-tools" aria-label="Масштаб дерева">
+              <button class="zoom-button" id="zoom-out" type="button" aria-label="Уменьшить дерево">−</button>
+              <span class="zoom-label" id="zoom-label">100%</span>
+              <button class="zoom-button" id="zoom-in" type="button" aria-label="Увеличить дерево">+</button>
+              <button class="zoom-button" id="zoom-fit" type="button" aria-label="Вернуть масштаб">↺</button>
+            </div>
+            <button class="toggle-button" id="show-all-button" type="button" aria-pressed="false">
+              <span aria-hidden="true">⌘</span><span>Показать всё дерево</span>
+            </button>
+          </div>
+        </div>
+        <div class="tree-context" id="tree-context">
+          <span class="context-icon" aria-hidden="true">i</span>
+          <span>Выберите узел или вариант развилки. Просмотр узла не меняет текущую позицию.</span>
+        </div>
+        <div class="tree-viewport" id="tree-viewport">
+          <div class="tree-surface" id="tree-surface">
+            <svg class="tree-svg" id="tree-svg" aria-hidden="true" focusable="false"></svg>
+            <div class="tree-node-layer" id="tree-nodes" role="tree" aria-label="Шаги и развилки алгоритма"></div>
+          </div>
+          <section class="canvas-image-preview" id="canvas-image-preview" role="region" aria-label="Скриншоты выбранного шага" hidden></section>
+        </div>
+        <div class="tree-legend" aria-label="Обозначения состояний">
+          <span class="legend-item"><i class="legend-dot current" aria-hidden="true"></i> Вы здесь</span>
+          <span class="legend-item"><i class="legend-dot passed" aria-hidden="true"></i> Пройдено</span>
+          <span class="legend-item"><i class="legend-line" aria-hidden="true"></i> Пройденный путь</span>
+          <span class="legend-item"><i class="legend-dot gap" aria-hidden="true"></i> Пробел в базе</span>
+          <span class="legend-item"><i class="legend-dot service-sms" aria-hidden="true"></i> SMS</span>
+          <span class="legend-item"><i class="legend-dot service-whatsapp" aria-hidden="true"></i> WhatsApp</span>
+          <span class="legend-item"><i class="legend-dot service-flowzap" aria-hidden="true"></i> FlowZap</span>
+          <span class="legend-item"><i class="legend-dot service-iwaba" aria-hidden="true"></i> iWabaKiT</span>
+          <span class="legend-item"><i class="legend-dot service-short" aria-hidden="true"></i> Короткие номера</span>
+        </div>
+      </section>
+
+      <aside class="detail-panel is-open" id="detail-panel" aria-label="Детали узла">
+        <div class="detail-top">
+          <div>
+            <div class="detail-kicker" id="detail-kicker">Текущий узел</div>
+            <h2 class="detail-title" id="detail-title">Загрузка…</h2>
+            <p class="detail-summary" id="detail-summary"></p>
+          </div>
+          <button class="detail-close" id="detail-close" type="button" aria-label="Закрыть панель деталей">×</button>
+        </div>
+        <div class="detail-scroll" id="detail-scroll"></div>
+        <div class="detail-footer" id="detail-footer"></div>
+      </aside>
+      <div class="mobile-scrim" id="mobile-scrim" hidden></div>
+    </main>
+  </div>
+
+  <div class="drawer-backdrop" id="sources-backdrop" hidden>
+    <section class="source-drawer" id="sources-drawer" role="dialog" aria-modal="true" aria-labelledby="sources-title">
+      <div class="drawer-head">
+        <div><h2 id="sources-title">Источники</h2><p>Ссылки на материалы и места, отмеченные для сверки.</p></div>
+        <button class="detail-close" id="sources-close" type="button" aria-label="Закрыть источники" style="display:inline-flex">×</button>
+      </div>
+      <div class="drawer-content" id="sources-content"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="live-region" id="live-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="tree-data.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const DATA = window.MANAGER_TREE;
+      if (!DATA || !Array.isArray(DATA.nodes)) {
+        document.getElementById("detail-title").textContent = "Не удалось загрузить дерево";
+        return;
+      }
+      const nodes = DATA.nodes;
+      const nodeById = new Map(nodes.map((node) => [node.id, node]));
+      const STORE_KEY = "kit-manager-tree-v3";
+      const NODE_W = 248;
+      const NODE_H = 120;
+      const GAP_X = 62;
+      const GAP_Y = 78;
+      const MIN_ZOOM = 0.85;
+      const MAX_ZOOM = 1.25;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let toastTimer = 0;
+      let zoom = 1;
+      let visibleNodeIds = [];
+      let canvasImageNodeId = "";
+      let canvasImageIndex = 0;
+      let dismissedCanvasImageFor = "";
+
+      const defaults = () => ({
+        path: ["start"],
+        current: "start",
+        viewed: "start",
+        choices: {},
+        values: {},
+        done: [],
+        checks: {},
+        answers: {},
+        showAll: false,
+        expanded: []
+      });
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORE_KEY);
+          if (!raw) return defaults();
+          const saved = JSON.parse(raw);
+          const state = Object.assign(defaults(), saved);
+          state.path = Array.isArray(state.path) ? state.path.filter((id) => nodeById.has(id)) : ["start"];
+          if (!state.path.length) state.path = ["start"];
+          const hashId = decodeURIComponent(location.hash.replace(/^#/, ""));
+          if (nodeById.has(hashId) && state.path.includes(hashId)) state.current = hashId;
+          else if (!nodeById.has(state.current) || !state.path.includes(state.current)) state.current = state.path[state.path.length - 1];
+          state.viewed = state.current;
+          state.choices = state.choices && typeof state.choices === "object" ? state.choices : {};
+          state.values = state.values && typeof state.values === "object" ? state.values : {};
+          state.done = Array.isArray(state.done) ? state.done.filter((id) => nodeById.has(id)) : [];
+          state.checks = state.checks && typeof state.checks === "object" ? state.checks : {};
+          state.answers = state.answers && typeof state.answers === "object" ? state.answers : {};
+          state.expanded = Array.isArray(state.expanded) ? state.expanded : [];
+          return state;
+        } catch (error) {
+          console.warn("Не удалось прочитать сохранённый маршрут.", error);
+          return defaults();
+        }
+      }
+
+      const state = loadState();
+
+      function escapeHTML(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+        }[char]));
+      }
+
+      function safeId(value) { return String(value).replace(/[^a-zA-Z0-9_-]/g, "-"); }
+      function getNode(id) { return nodeById.get(id); }
+
+      function edgeList(node, includeLoops) {
+        if (!node) return [];
+        let edges = [];
+        if (node.type === "DECISION") {
+          edges = (node.options || []).map((option, index) => ({
+            from: node.id, to: option.to, label: option.loopLabel || option.label, loop: Boolean(option.loop),
+            optionIndex: index, option: option
+          }));
+        } else if (node.next) {
+          edges = [{ from: node.id, to: node.next, label: node.loopLabel || (node.loop ? "Вернуться к шагу" : ""), loop: Boolean(node.loop) }];
+        }
+        return includeLoops ? edges : edges.filter((edge) => !edge.loop);
+      }
+
+      function validateTree() {
+        const errors = [];
+        const ids = new Set();
+        nodes.forEach((node) => {
+          if (ids.has(node.id)) errors.push("Повторяется id узла: " + node.id);
+          ids.add(node.id);
+          if (node.type === "DECISION" && !(node.options || []).length) errors.push("У развилки нет вариантов: " + node.id);
+          if (node.type !== "DECISION" && node.type !== "END" && !node.next) errors.push("У узла нет исхода: " + node.id);
+        });
+        nodes.forEach((node) => edgeList(node, true).forEach((edge) => {
+          if (!nodeById.has(edge.to)) errors.push("Ссылка ведёт к отсутствующему узлу: " + node.id + " → " + edge.to);
+        }));
+        const seen = new Set();
+        const pending = ["start"];
+        while (pending.length) {
+          const id = pending.shift();
+          if (seen.has(id) || !nodeById.has(id)) continue;
+          seen.add(id);
+          edgeList(getNode(id), true).forEach((edge) => pending.push(edge.to));
+        }
+        nodes.forEach((node) => {
+          if (!seen.has(node.id) && node.type !== "GAP") errors.push("Недостижимый узел: " + node.id);
+        });
+        if (errors.length) console.error("Проверка дерева обнаружила проблемы:", errors);
+        else console.info("Дерево алгоритма: проверены исходы, ссылки и достижимость узлов.");
+        return errors;
+      }
+
+      function persist() {
+        try {
+          const safeState = {
+            path: state.path,
+            current: state.current,
+            choices: state.choices,
+            values: state.values,
+            done: state.done,
+            checks: state.checks,
+            answers: state.answers
+          };
+          localStorage.setItem(STORE_KEY, JSON.stringify(safeState));
+          history.replaceState(null, "", "#" + encodeURIComponent(state.current));
+        } catch (error) {
+          console.warn("Не удалось сохранить маршрут на этом устройстве.", error);
+        }
+      }
+
+      function announce(message) {
+        document.getElementById("live-region").textContent = "";
+        window.setTimeout(() => { document.getElementById("live-region").textContent = message; }, 15);
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 2200);
+      }
+
+      function routeValues() {
+        const channels = Array.isArray(state.values.channels) ? state.values.channels : [];
+        const result = [];
+        if (channels.includes("sms")) result.push("sms");
+        if (channels.includes("whatsapp")) {
+          if (state.values.whatsappRoute === "flowzap") result.push("flowzap");
+          if (state.values.whatsappRoute === "iwabakit") result.push("iwaba");
+        }
+        return result;
+      }
+
+      function activeChoiceLabels() {
+        const values = state.values;
+        const output = ["Приём"];
+        if (values.clientType === "new") output.push("Новый клиент");
+        if (values.clientType === "existing") output.push("Действующий клиент");
+        if (state.path.includes("step2-needs")) output.push("Потребность");
+        if (Array.isArray(values.channels) && values.channels.length) {
+          const channels = values.channels.map((value) => value === "sms" ? "SMS" : value === "whatsapp" ? "WhatsApp" : value);
+          output.push(channels.join(" + "));
+        }
+        if (values.whatsappRoute === "flowzap") output.push("FlowZap");
+        if (values.whatsappRoute === "iwabakit") output.push("iWabaKiT");
+        const currentNode = getNode(state.current);
+        const step = currentNode && currentNode.step ? currentNode.step : 1;
+        if (step >= 4) output.push("Тест / договор");
+        if (step >= 5) output.push("Подключение");
+        if (step >= 6) output.push("Закрытие");
+        if (currentNode && currentNode.type === "HANDOFF") output.push("Передача специалисту");
+        if (currentNode && currentNode.type === "GAP") output.push("Пробел в базе");
+        return output.filter((label, index, all) => all.indexOf(label) === index).slice(-5);
+      }
+
+      function renderHeader() {
+        const crumbHost = document.getElementById("breadcrumbs");
+        const crumbs = activeChoiceLabels();
+        crumbHost.innerHTML = crumbs.map((label, index) => (
+          (index ? '<span class="crumb-separator" aria-hidden="true">›</span>' : "") +
+          '<span class="crumb">' + escapeHTML(label) + "</span>"
+        )).join("");
+        const node = getNode(state.current);
+        const step = Math.max(1, Math.min(6, Number(node && node.step) || 1));
+        document.getElementById("progress-label").textContent = "Шаг " + step + " из 6";
+        const track = document.getElementById("progress-track");
+        track.innerHTML = Array.from({ length: 6 }, (_, index) => {
+          const className = index + 1 < step ? "is-done" : index + 1 === step ? "is-current" : "";
+          return '<i class="progress-segment ' + className + '"></i>';
+        }).join("");
+        document.getElementById("back-button").disabled = state.path.length <= 1 && state.viewed === state.current;
+      }
+
+      function nodeTypeLabel(node) {
+        const labels = {
+          START: "Старт", STEP: "Действие", DECISION: "Развилка", SCRIPT: "Скрипт",
+          HANDOFF: "Специалист", GATE: "Предупреждение", GAP: "Пробел", END: "Завершение"
+        };
+        return labels[node.type] || node.type;
+      }
+
+      function typeIcon(node) {
+        const icons = {
+          START: "●", STEP: "✓", DECISION: "?", SCRIPT: "“", HANDOFF: "↗",
+          GATE: "!", GAP: "···", END: "◎"
+        };
+        if (node.product === "SMS") return "S";
+        return icons[node.type] || "•";
+      }
+
+      function productToken(product) {
+        if (product === "SMS") return "sms";
+        if (product === "WhatsApp") return "whatsapp";
+        if (product === "iWabaKiT" || product === "WhatsApp Business API") return "iwaba";
+        if (product === "FlowZap") return "flowzap";
+        if (product === "Короткие номера") return "short";
+        return "";
+      }
+
+      function productClass(product) {
+        const token = productToken(product);
+        return token ? "product-" + token : "";
+      }
+
+      function productClasses(node) {
+        const products = Array.isArray(node.product) ? node.product : [node.product];
+        return products.map(productClass).filter((name, index, names) => name && names.indexOf(name) === index);
+      }
+
+      function nodeStatus(node, pseudo) {
+        if (pseudo) return { className: "state-muted", label: "Ветка свёрнута" };
+        if (node.id === state.current) return { className: "state-current", label: "● Вы здесь" };
+        if (state.done.includes(node.id)) return { className: "state-done", label: "✓ Пройдено" };
+        const currentIndex = state.path.lastIndexOf(state.current);
+        const nodeIndex = state.path.lastIndexOf(node.id);
+        if (nodeIndex >= 0 && nodeIndex < currentIndex) return { className: "state-done", label: "✓ Пройдено" };
+        if (isInUnselectedBranch(node.id)) return { className: "state-muted", label: "Не выбранная ветка" };
+        if (!state.path.includes(node.id) && !pseudo) return { className: "state-available", label: "Доступен дальше" };
+        return { className: "state-available", label: "На маршруте" };
+      }
+
+      function hasForwardPath(fromId, toId) {
+        if (fromId === toId) return true;
+        const visited = new Set();
+        const queue = [fromId];
+        while (queue.length) {
+          const id = queue.shift();
+          if (visited.has(id)) continue;
+          visited.add(id);
+          const node = getNode(id);
+          if (!node) continue;
+          for (const edge of edgeList(node, false)) {
+            if (edge.to === toId) return true;
+            if (!visited.has(edge.to)) queue.push(edge.to);
+          }
+        }
+        return false;
+      }
+
+      function isInUnselectedBranch(nodeId) {
+        for (const [decisionId, selection] of Object.entries(state.choices)) {
+          const decision = getNode(decisionId);
+          if (!decision || decision.type !== "DECISION" || !selection) continue;
+          const selectedOption = decision.options && decision.options[selection.index];
+          if (!selectedOption) continue;
+          for (let index = 0; index < decision.options.length; index += 1) {
+            if (index === selection.index) continue;
+            const alternate = decision.options[index];
+            if (hasForwardPath(alternate.to, nodeId) && !hasForwardPath(selectedOption.to, nodeId)) return true;
+          }
+        }
+        return false;
+      }
+
+      function getAllReachable() {
+        const output = [];
+        const visited = new Set();
+        const queue = ["start"];
+        while (queue.length) {
+          const id = queue.shift();
+          if (visited.has(id) || !nodeById.has(id)) continue;
+          visited.add(id);
+          output.push(getNode(id));
+          edgeList(getNode(id), false).forEach((edge) => queue.push(edge.to));
+        }
+        return output;
+      }
+
+      function findPathTo(targetId) {
+        const queue = [{ id: "start", path: ["start"] }];
+        const visited = new Set();
+        while (queue.length) {
+          const entry = queue.shift();
+          if (entry.id === targetId) return entry.path;
+          if (visited.has(entry.id)) continue;
+          visited.add(entry.id);
+          edgeList(getNode(entry.id), false).forEach((edge) => {
+            if (!visited.has(edge.to)) queue.push({ id: edge.to, path: entry.path.concat(edge.to) });
+          });
+        }
+        return null;
+      }
+
+      function makeVisibleGraph() {
+        const actual = new Map();
+        const pseudo = new Map();
+        const extraEdges = [];
+        const pathIds = new Set(state.path);
+        const add = (id) => {
+          if (nodeById.has(id)) actual.set(id, getNode(id));
+        };
+        if (state.showAll) {
+          getAllReachable().forEach((node) => add(node.id));
+        } else {
+          state.path.forEach(add);
+          const handledDecisions = new Set();
+          state.path.forEach((id) => {
+            const node = getNode(id);
+            if (!node || node.type !== "DECISION" || handledDecisions.has(id)) return;
+            handledDecisions.add(id);
+            const selected = state.choices[id];
+            if (!selected) return;
+            (node.options || []).forEach((option, optionIndex) => {
+              if (optionIndex === selected.index) return;
+              const expandKey = id + ":" + optionIndex;
+              if (state.expanded.includes(expandKey)) {
+                addExpandedBranch(option.to, pathIds, actual, new Set());
+              } else {
+                const pseudoId = "fold-" + id + "-" + optionIndex;
+                pseudo.set(pseudoId, {
+                  id: pseudoId,
+                  pseudo: true,
+                  parent: id,
+                  target: option.to,
+                  optionIndex: optionIndex,
+                  title: option.label,
+                  summary: "Нажмите, чтобы развернуть эту ветку.",
+                  type: "COLLAPSED",
+                  source: node.source
+                });
+                extraEdges.push({ from: id, to: pseudoId, label: option.label, collapsed: true });
+              }
+            });
+          });
+          previewAhead(state.current, 3, add, new Set());
+        }
+        const objects = new Map([...actual.entries(), ...pseudo.entries()]);
+        const edges = [];
+        actual.forEach((node) => {
+          edgeList(node, true).forEach((edge) => {
+            if (objects.has(edge.to)) edges.push(edge);
+          });
+        });
+        extraEdges.forEach((edge) => edges.push(edge));
+        if (state.showAll) {
+          // Loop edges remain visible even though they are excluded from layout traversal.
+          getAllReachable().forEach((node) => {
+            edgeList(node, true).filter((edge) => edge.loop && objects.has(edge.to)).forEach((edge) => edges.push(edge));
+          });
+        }
+        return { objects, edges, actual };
+      }
+
+      function previewAhead(id, remaining, add, visited) {
+        const node = getNode(id);
+        if (!node || visited.has(id) || remaining <= 0) return;
+        visited.add(id);
+        if (node.type === "DECISION") {
+          add(node.id);
+          (node.options || []).forEach((option) => add(option.to));
+          return;
+        }
+        if (!node.next || node.loop) return;
+        const next = getNode(node.next);
+        if (!next) return;
+        add(next.id);
+        if (next.type === "DECISION") {
+          (next.options || []).forEach((option) => add(option.to));
+          return;
+        }
+        previewAhead(next.id, remaining - 1, add, visited);
+      }
+
+      function addExpandedBranch(id, activePath, actual, visiting) {
+        if (!nodeById.has(id) || visiting.has(id) || activePath.has(id)) return;
+        const node = getNode(id);
+        actual.set(id, node);
+        visiting.add(id);
+        edgeList(node, false).forEach((edge) => addExpandedBranch(edge.to, activePath, actual, visiting));
+        visiting.delete(id);
+      }
+
+      function breadthOrder(objects, edges) {
+        const depth = new Map([["start", 0]]);
+        const order = [];
+        const queue = ["start"];
+        while (queue.length) {
+          const id = queue.shift();
+          if (!objects.has(id) || order.includes(id)) continue;
+          order.push(id);
+          const nextEdges = edges.filter((edge) => edge.from === id && !edge.loop).sort((a, b) => {
+            if (a.collapsed && !b.collapsed) return 1;
+            if (!a.collapsed && b.collapsed) return -1;
+            return 0;
+          });
+          nextEdges.forEach((edge) => {
+            if (!depth.has(edge.to)) depth.set(edge.to, (depth.get(id) || 0) + 1);
+            queue.push(edge.to);
+          });
+        }
+        objects.forEach((_, id) => {
+          if (!depth.has(id)) {
+            const incoming = edges.find((edge) => edge.to === id);
+            const parentDepth = incoming ? depth.get(incoming.from) : 0;
+            depth.set(id, (parentDepth || 0) + 1);
+            order.push(id);
+          }
+        });
+        return { order, depth };
+      }
+
+      function pathEdgeKeys() {
+        const set = new Set();
+        for (let index = 1; index < state.path.length; index += 1) set.add(state.path[index - 1] + ">" + state.path[index]);
+        Object.keys(state.choices).forEach((id) => {
+          const choice = state.choices[id];
+          const node = getNode(id);
+          if (node && choice && node.options && node.options[choice.index]) set.add(id + ">" + node.options[choice.index].to);
+        });
+        return set;
+      }
+
+      function edgePath(from, to, loop) {
+        const sx = from.x + NODE_W / 2;
+        const sy = from.y + NODE_H - 1;
+        const tx = to.x + NODE_W / 2;
+        const ty = to.y;
+        if (loop || ty <= sy) {
+          const outside = Math.min(from.x, to.x) - 34;
+          return "M " + sx + " " + sy + " C " + (sx - 38) + " " + (sy + 28) + ", " + outside + " " + (sy + 24) + ", " + outside + " " + (sy + 65) +
+            " C " + outside + " " + (ty - 28) + ", " + (tx - 26) + " " + (ty - 28) + ", " + tx + " " + ty;
+        }
+        const middle = (sy + ty) / 2;
+        return "M " + sx + " " + sy + " C " + sx + " " + middle + ", " + tx + " " + middle + ", " + tx + " " + ty;
+      }
+
+      function renderTree() {
+        const graph = makeVisibleGraph();
+        const ordering = breadthOrder(graph.objects, graph.edges);
+        const depth = ordering.depth;
+        const rowMap = new Map();
+        ordering.order.forEach((id) => {
+          const row = depth.get(id) || 0;
+          if (!rowMap.has(row)) rowMap.set(row, []);
+          rowMap.get(row).push(id);
+        });
+        const positions = new Map();
+        let widest = 1;
+        rowMap.forEach((row, rowIndex) => {
+          widest = Math.max(widest, row.length);
+          row.forEach((id, index) => {
+            positions.set(id, {
+              x: 30 + index * (NODE_W + GAP_X),
+              y: 24 + rowIndex * (NODE_H + GAP_Y)
+            });
+          });
+        });
+        const maxDepth = Math.max(0, ...Array.from(rowMap.keys()));
+        const width = Math.max(800, 60 + widest * NODE_W + Math.max(0, widest - 1) * GAP_X);
+        const height = Math.max(340, 45 + (maxDepth + 1) * NODE_H + maxDepth * GAP_Y);
+        const surface = document.getElementById("tree-surface");
+        const svg = document.getElementById("tree-svg");
+        const layer = document.getElementById("tree-nodes");
+        surface.style.width = (width * zoom) + "px";
+        surface.style.height = (height * zoom) + "px";
+        svg.setAttribute("width", String(width * zoom));
+        svg.setAttribute("height", String(height * zoom));
+        svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+        const activeEdges = pathEdgeKeys();
+        const renderedEdges = [];
+        graph.edges.forEach((edge) => {
+          const from = positions.get(edge.from);
+          const to = positions.get(edge.to);
+          if (!from || !to) return;
+          const isPassed = activeEdges.has(edge.from + ">" + edge.to);
+          const isSelected = edge.optionIndex != null && state.choices[edge.from] && state.choices[edge.from].index === edge.optionIndex;
+          const classes = ["edge-path"];
+          const edgeTarget = graph.objects.get(edge.to) || getNode(edge.to);
+          const edgeSource = graph.objects.get(edge.from) || getNode(edge.from);
+          const edgeProducts = productClasses(edgeTarget || {}).length ? productClasses(edgeTarget || {}) : productClasses(edgeSource || {});
+          if (edgeProducts.length) classes.push(edgeProducts[edgeProducts.length - 1].replace("product-", "route-"));
+          if (isPassed) classes.push("is-passed");
+          else if (isSelected) classes.push("is-selected");
+          if (edge.loop) classes.push("is-loop");
+          renderedEdges.push('<path class="' + classes.join(" ") + '" d="' + edgePath(from, to, edge.loop) + '" marker-end="url(#arrow-end)"></path>');
+          if (edge.label) {
+            const labelWidth = Math.max(56, Math.min(210, edge.label.length * 7 + 20));
+            let lx = (from.x + NODE_W / 2 + to.x + NODE_W / 2) / 2 - labelWidth / 2;
+            let ly = edge.loop ? Math.max(24, Math.min(from.y, to.y) + 43) : (from.y + NODE_H + to.y) / 2 - 13;
+            if (edge.collapsed) ly = from.y + NODE_H + 10;
+            lx = Math.max(2, Math.min(width - labelWidth - 3, lx));
+            renderedEdges.push('<rect class="edge-label-bg" x="' + lx + '" y="' + ly + '" width="' + labelWidth + '" height="25" rx="7"></rect>');
+            renderedEdges.push('<text class="edge-label-text" x="' + (lx + labelWidth / 2) + '" y="' + (ly + 17) + '" text-anchor="middle">' + escapeHTML(edge.label) + '</text>');
+          }
+        });
+        svg.innerHTML = '<defs><marker id="arrow-end" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9cab9f"></path></marker></defs>' + renderedEdges.join("");
+
+        visibleNodeIds = ordering.order;
+        const mobileItems = [];
+        ordering.order.forEach((id) => {
+          const node = graph.objects.get(id);
+          const pos = positions.get(id);
+          if (!node || !pos) return;
+          const pseudo = Boolean(node.pseudo);
+          const status = nodeStatus(node, pseudo);
+          const flags = pseudo ? [] : (node.flags || []);
+          const badges = [];
+          if (flags.some((flag) => flag.kind === "gap")) badges.push('<span class="node-mini-badge gap">Нет в базе знаний</span>');
+          else if (node.type === "GAP") badges.push('<span class="node-mini-badge gap">Нет в базе знаний</span>');
+          if (flags.some((flag) => flag.kind === "review")) badges.push('<span class="node-mini-badge review">Требует проверки</span>');
+          const products = Array.isArray(node.product) ? node.product : [node.product];
+          const productClassesForNode = pseudo ? [] : productClasses(node);
+          if (productClassesForNode.length) {
+            products.forEach((product) => {
+              const productBadgeClass = productClass(product);
+              if (productBadgeClass) badges.push('<span class="node-mini-badge ' + productBadgeClass + '">' + escapeHTML(product) + '</span>');
+            });
+          }
+          const isCurrent = !pseudo && node.id === state.current;
+          const isViewed = !pseudo && node.id === state.viewed;
+          const classes = ["flow-node-card", pseudo ? "collapsed-node" : "type-" + node.type, status.className];
+          productClassesForNode.forEach((name) => classes.push(name.replace("product-", "route-")));
+          if (productClassesForNode.length > 1) classes.push("route-multi");
+          if (flags.some((flag) => flag.kind === "review")) classes.push("has-review");
+          if (isViewed) classes.push("is-viewed");
+          const level = (depth.get(id) || 0) + 1;
+          const currentAttr = isCurrent ? ' aria-current="step"' : "";
+          const selectedAttr = isViewed ? ' aria-selected="true"' : ' aria-selected="false"';
+          const style = "left:" + (pos.x * zoom) + "px;top:" + (pos.y * zoom) + "px;width:" + (NODE_W * zoom) + "px;min-height:" + (NODE_H * zoom) + "px;";
+          const title = pseudo ? node.title : node.title;
+          const summary = node.summary || "";
+          const clickAttr = pseudo ? ' data-fold-id="' + escapeHTML(node.id) + '"' : ' data-node-id="' + escapeHTML(node.id) + '"';
+          const card = '<button class="' + classes.join(" ") + '" type="button" role="treeitem" aria-level="' + level + '"' + currentAttr + selectedAttr + ' style="' + style + '"' + clickAttr + '>' +
+            '<span class="node-head"><span class="node-type-icon" aria-hidden="true">' + (pseudo ? "↳" : typeIcon(node)) + '</span>' +
+            '<span class="node-type-label">' + (pseudo ? "Свёрнутая ветка" : escapeHTML(nodeTypeLabel(node))) + '</span>' +
+            '<span class="node-status">' + escapeHTML(status.label) + '</span></span>' +
+            '<span class="node-title">' + escapeHTML(title) + '</span>' +
+            '<span class="node-summary">' + escapeHTML(summary) + '</span>' +
+            (badges.length ? '<span class="node-foot">' + badges.join("") + '</span>' : "") +
+            '</button>';
+          const incoming = graph.edges.filter((edge) => edge.to === id);
+          let mobileLabel = "";
+          if (incoming.length) {
+            const edge = incoming.find((item) => activeEdges.has(item.from + ">" + item.to)) || incoming[0];
+            const fromNode = getNode(edge.from);
+            let label = edge.label || (fromNode ? fromNode.title : "");
+            if (edge.loop) label = "↶ Возврат: " + label;
+            mobileLabel = '<div class="mobile-edge" aria-hidden="true">↓ ' + escapeHTML(label) + '</div>';
+          }
+          mobileItems.push(mobileLabel + card);
+        });
+        layer.innerHTML = mobileItems.join("");
+        layer.style.transform = "scale(1)";
+        document.getElementById("zoom-label").textContent = Math.round(zoom * 100) + "%";
+        document.getElementById("show-all-button").setAttribute("aria-pressed", String(state.showAll));
+        document.getElementById("show-all-button").querySelector("span:last-child").textContent = state.showAll ? "Только мой маршрут" : "Показать всё дерево";
+
+        layer.querySelectorAll("[data-node-id]").forEach((button) => {
+          button.addEventListener("click", () => setViewed(button.dataset.nodeId, true));
+          button.addEventListener("keydown", onTreeNodeKeydown);
+        });
+        layer.querySelectorAll("[data-fold-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const pseudo = graph.objects.get(button.dataset.foldId);
+            if (!pseudo) return;
+            const key = pseudo.parent + ":" + pseudo.optionIndex;
+            if (state.expanded.includes(key)) state.expanded = state.expanded.filter((item) => item !== key);
+            else state.expanded.push(key);
+            renderTree();
+          });
+        });
+        renderCanvasImagePreview();
+        if (state.current && document.getElementById("tree-viewport").dataset.centerCurrent === "true") {
+          document.getElementById("tree-viewport").dataset.centerCurrent = "false";
+          centerOnNode(state.current);
+        }
+      }
+
+      function onTreeNodeKeydown(event) {
+        const directions = ["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"];
+        if (directions.includes(event.key)) {
+          event.preventDefault();
+          const nodeId = event.currentTarget.dataset.nodeId;
+          const at = Math.max(0, visibleNodeIds.indexOf(nodeId));
+          const forward = event.key === "ArrowDown" || event.key === "ArrowRight";
+          const nextAt = Math.max(0, Math.min(visibleNodeIds.length - 1, at + (forward ? 1 : -1)));
+          const nextButton = document.querySelector('[data-node-id="' + CSS.escape(visibleNodeIds[nextAt]) + '"]');
+          if (nextButton) nextButton.focus();
+        } else if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setViewed(event.currentTarget.dataset.nodeId, true);
+        }
+      }
+
+      function centerOnNode(id) {
+        const viewport = document.getElementById("tree-viewport");
+        const target = document.getElementById("tree-nodes").querySelector('[data-node-id="' + CSS.escape(id) + '"]');
+        if (target && window.matchMedia("(max-width: 700px)").matches) {
+          target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+        } else if (target) {
+          target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center", inline: "center" });
+        } else {
+          viewport.scrollTo({ top: 0, left: 0, behavior: reducedMotion ? "auto" : "smooth" });
+        }
+      }
+
+      function setViewed(id, openPanel) {
+        if (!nodeById.has(id)) return;
+        state.viewed = id;
+        if (openPanel) dismissedCanvasImageFor = "";
+        renderDetails();
+        if (openPanel) openDetails();
+        renderTree();
+      }
+
+      function optionPath(nodeId) {
+        const at = state.path.lastIndexOf(nodeId);
+        if (at >= 0) return state.path.slice(0, at + 1);
+        return findPathTo(nodeId) || ["start", nodeId];
+      }
+
+      function pruneStateToPath(prefix) {
+        const allowed = new Set(prefix);
+        Object.keys(state.choices).forEach((id) => { if (!allowed.has(id)) delete state.choices[id]; });
+        state.done = state.done.filter((id) => allowed.has(id));
+        Object.keys(state.checks).forEach((key) => {
+          const owner = key.split("|")[0];
+          if (!allowed.has(owner)) delete state.checks[key];
+        });
+        Object.keys(state.answers).forEach((id) => { if (!allowed.has(id)) delete state.answers[id]; });
+        state.expanded = [];
+        state.values = {};
+        prefix.forEach((id) => {
+          const selection = state.choices[id];
+          const node = getNode(id);
+          if (!selection || !node || !node.options || !node.options[selection.index]) return;
+          Object.assign(state.values, node.options[selection.index].choice || {});
+        });
+      }
+
+      function chooseOption(nodeId, optionIndex) {
+        const node = getNode(nodeId);
+        if (!node || node.type !== "DECISION" || !node.options[optionIndex]) return;
+        let prefix = optionPath(nodeId);
+        pruneStateToPath(prefix);
+        const option = node.options[optionIndex];
+        state.choices[nodeId] = { index: optionIndex, label: option.label };
+        Object.assign(state.values, option.choice || {});
+        state.path = prefix.concat(option.to);
+        state.current = option.to;
+        state.viewed = option.to;
+        persist();
+        renderAll();
+        document.getElementById("tree-viewport").dataset.centerCurrent = "true";
+        renderTree();
+        announce("Выбрано: " + option.label + ". Вы здесь: " + getNode(option.to).title);
+        centerOnNode(option.to);
+        showToast("Маршрут обновлён");
+      }
+
+      function markDone() {
+        const node = getNode(state.current);
+        if (!node || !node.next) return;
+        if (!state.done.includes(node.id)) state.done.push(node.id);
+        state.path.push(node.next);
+        state.current = node.next;
+        state.viewed = node.next;
+        persist();
+        renderAll();
+        document.getElementById("tree-viewport").dataset.centerCurrent = "true";
+        renderTree();
+        announce("Шаг выполнен. Вы здесь: " + getNode(node.next).title);
+        centerOnNode(node.next);
+      }
+
+      function goBack() {
+        if (state.viewed !== state.current) {
+          state.viewed = state.current;
+          renderAll();
+          openDetails();
+          centerOnNode(state.current);
+          return;
+        }
+        if (state.path.length <= 1) return;
+        state.path.pop();
+        state.current = state.path[state.path.length - 1];
+        state.viewed = state.current;
+        persist();
+        renderAll();
+        openDetails();
+        centerOnNode(state.current);
+        announce("Назад. Вы здесь: " + getNode(state.current).title);
+      }
+
+      function goCurrent() {
+        state.viewed = state.current;
+        renderAll();
+        openDetails();
+        centerOnNode(state.current);
+        announce("Текущая позиция: " + getNode(state.current).title);
+      }
+
+      function resetJourney() {
+        localStorage.removeItem(STORE_KEY);
+        Object.assign(state, defaults());
+        state.viewed = "start";
+        state.showAll = false;
+        state.expanded = [];
+        renderAll();
+        openDetails();
+        history.replaceState(null, "", location.pathname + location.search + "#start");
+        centerOnNode("start");
+        announce("Начата новая консультация.");
+        showToast("Новая консультация");
+      }
+
+      function updateCheck(key, checked) {
+        state.checks[key] = checked;
+        persist();
+      }
+
+      function updateQuestion(nodeId, questionId, checked) {
+        const answers = new Set(state.answers[nodeId] || []);
+        if (checked) answers.add(questionId);
+        else answers.delete(questionId);
+        state.answers[nodeId] = Array.from(answers);
+        persist();
+        const count = state.answers[nodeId].length;
+        const counter = document.getElementById("question-count");
+        if (counter) counter.textContent = count + " из " + ((getNode(nodeId).questions || []).length) + " отмечено";
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("Скрипт скопирован");
+        } catch (error) {
+          const field = document.createElement("textarea");
+          field.value = text;
+          field.setAttribute("readonly", "");
+          field.style.position = "fixed";
+          field.style.opacity = "0";
+          document.body.appendChild(field);
+          field.select();
+          const copied = document.execCommand("copy");
+          field.remove();
+          showToast(copied ? "Скрипт скопирован" : "Не удалось скопировать. Выделите текст вручную.");
+        }
+      }
+
+      function renderFlag(flag) {
+        const type = flag.kind === "review" ? "review" : flag.kind === "gap" ? "gap" : "gate";
+        const icon = flag.kind === "review" ? "!" : flag.kind === "gap" ? "···" : "⚠";
+        return '<div class="flag-card ' + type + '"><div class="flag-title"><span aria-hidden="true">' + icon + '</span>' + escapeHTML(flag.label || "Важно") + '</div><p class="flag-text">' + escapeHTML(flag.text) + "</p></div>";
+      }
+
+      function renderScript(script, index) {
+        const title = script.title || "Скрипт";
+        const text = script.text || "";
+        return '<div class="script-card"><div class="script-card-head"><h4 class="script-title">' + escapeHTML(title) + '</h4><button class="copy-button" type="button" data-copy-text="' + escapeHTML(text) + '" aria-label="Скопировать скрипт: ' + escapeHTML(title) + '">Скопировать</button></div><p class="script-text">' + escapeHTML(text) + "</p></div>";
+      }
+
+      function renderChecklists(node, groups, prefix) {
+        return groups.map((group, groupIndex) => {
+          const title = group.title ? '<h3 class="detail-section-title">' + escapeHTML(group.title) + "</h3>" : "";
+          const items = (group.items || []).map((item, itemIndex) => {
+            const key = node.id + "|" + prefix + "|" + groupIndex + "|" + itemIndex;
+            const checked = Boolean(state.checks[key]);
+            return '<button class="check-item" type="button" role="checkbox" aria-checked="' + checked + '" aria-pressed="' + checked + '" data-check-key="' + escapeHTML(key) + '">' +
+              '<span class="check-box" aria-hidden="true">✓</span><span class="check-text">' + escapeHTML(item) + "</span></button>";
+          }).join("");
+          return '<section class="detail-section">' + title + '<div class="checklist">' + items + "</div></section>";
+        }).join("");
+      }
+
+      function renderQuestions(node) {
+        const items = node.questions || [];
+        const checked = new Set(state.answers[node.id] || []);
+        const questions = items.map((item, index) => {
+          const active = checked.has(item.id);
+          return '<div class="question-entry"><button class="question-item" type="button" aria-pressed="' + active + '" data-question-id="' + escapeHTML(item.id) + '">' +
+            '<span class="question-number">' + String(index + 1).padStart(2, "0") + '</span>' +
+            '<span class="question-text"><strong>' + escapeHTML(item.title) + '</strong><span>' + escapeHTML(item.text) + "</span></span>" +
+            '<span class="question-mark" aria-hidden="true">✓</span></button><button class="question-copy-button" type="button" data-copy-text="' + escapeHTML(item.text) + '" aria-label="Скопировать вопрос: ' + escapeHTML(item.title) + '">Копировать</button></div>';
+        }).join("");
+        return '<section class="detail-section"><h3 class="detail-section-title">Вопросы клиенту</h3><p class="question-count" id="question-count">' + checked.size + " из " + items.length + ' отмечено. Отметки сохраняются только на этом устройстве.</p><div class="question-list">' + questions + "</div></section>";
+      }
+
+      function renderLinks(links) {
+        if (!links || !links.length) return "";
+        return '<div class="links-list">' + links.map((link) => {
+          const item = typeof link === "string" ? DATA.links[link] : link;
+          if (!item) return "";
+          return '<a class="source-link" href="' + escapeHTML(item.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHTML(item.label) + ' ↗</a>';
+        }).join("") + "</div>";
+      }
+
+      function renderGuideImages(images) {
+        if (!images || !images.length) return "";
+        return '<div class="guide-gallery">' + images.map((item) => {
+          if (!item || !item.src) return "";
+          const caption = item.caption || item.alt || "Скриншот инструкции";
+          return '<figure class="guide-figure"><a href="' + escapeHTML(item.src) + '" target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение полностью: ' + escapeHTML(caption) + '"><img src="' + escapeHTML(item.src) + '" alt="' + escapeHTML(item.alt || caption) + '" loading="lazy"></a><figcaption>' + escapeHTML(caption) + '<span>Увеличить ↗</span></figcaption></figure>';
+        }).join("") + "</div>";
+      }
+
+
+      function imagesForNode(node) {
+        if (!node) return [];
+        const images = [];
+        const add = (item) => {
+          if (!item || !item.src || images.some((image) => image.src === item.src)) return;
+          images.push({ src: item.src, alt: item.alt || item.caption || "Скриншот инструкции", caption: item.caption || item.alt || "Скриншот инструкции" });
+        };
+        (node.images || []).forEach(add);
+        (node.content || []).forEach((part) => {
+          if (part.kind === "image") add(part.image || part);
+        });
+        Object.values(node.setupRoutes || {}).forEach((route) => (route.images || []).forEach(add));
+        return images;
+      }
+
+      function renderNodeImageAccess(node, images) {
+        if (!images.length) return "";
+        if (window.matchMedia("(max-width: 700px)").matches) {
+          return '<section class="detail-section"><h3 class="detail-section-title">Скриншоты шага</h3><p class="detail-paragraph">На телефоне изображения открываются в карточке шага.</p>' + renderGuideImages(images) + "</section>";
+        }
+        return '<section class="detail-section"><div class="canvas-image-access"><span>Скриншоты этого шага показаны прямо на полотне flowchart.</span><button type="button" data-open-canvas-images>Показать на полотне</button></div></section>';
+      }
+
+      function positionCanvasImagePreview(node) {
+        const panel = document.getElementById("canvas-image-preview");
+        const viewport = document.getElementById("tree-viewport");
+        if (!panel || panel.hidden || !viewport) return;
+        const target = node && document.getElementById("tree-nodes").querySelector('[data-node-id="' + CSS.escape(node.id) + '"]');
+        const viewportRect = viewport.getBoundingClientRect();
+        const width = Math.min(370, Math.max(0, viewport.clientWidth - 24));
+        panel.style.width = width + "px";
+        const panelWidth = panel.offsetWidth;
+        const panelHeight = panel.offsetHeight;
+        const margin = 12;
+        const maxX = Math.max(margin, viewport.clientWidth - panelWidth - margin);
+        const maxY = Math.max(margin, viewport.clientHeight - panelHeight - margin);
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+        const targetRect = target ? target.getBoundingClientRect() : viewportRect;
+        const raw = target ? [
+          { x: targetRect.right - viewportRect.left + 12, y: targetRect.top - viewportRect.top },
+          { x: targetRect.left - viewportRect.left - panelWidth - 12, y: targetRect.top - viewportRect.top },
+          { x: targetRect.left - viewportRect.left, y: targetRect.bottom - viewportRect.top + 12 },
+          { x: targetRect.left - viewportRect.left, y: targetRect.top - viewportRect.top - panelHeight - 12 }
+        ] : [{ x: maxX, y: margin }];
+        const otherNodes = Array.from(document.getElementById("tree-nodes").querySelectorAll("[data-node-id]"))
+          .filter((button) => button !== target).map((button) => button.getBoundingClientRect());
+        const candidates = raw.map((candidate) => ({ x: clamp(candidate.x, margin, maxX), y: clamp(candidate.y, margin, maxY) }));
+        const score = (candidate) => otherNodes.reduce((sum, rect) => {
+          const left = Math.max(candidate.x, rect.left - viewportRect.left);
+          const top = Math.max(candidate.y, rect.top - viewportRect.top);
+          const right = Math.min(candidate.x + panelWidth, rect.right - viewportRect.left);
+          const bottom = Math.min(candidate.y + panelHeight, rect.bottom - viewportRect.top);
+          return sum + Math.max(0, right - left) * Math.max(0, bottom - top);
+        }, 0);
+        candidates.sort((a, b) => score(a) - score(b));
+        const best = candidates[0];
+        panel.style.left = Math.round(best.x + viewport.scrollLeft) + "px";
+        panel.style.top = Math.round(best.y + viewport.scrollTop) + "px";
+      }
+
+      function closeCanvasImagePreview() {
+        const panel = document.getElementById("canvas-image-preview");
+        if (!panel) return;
+        dismissedCanvasImageFor = state.viewed;
+        panel.hidden = true;
+        panel.innerHTML = "";
+      }
+
+      function renderCanvasImagePreview() {
+        const panel = document.getElementById("canvas-image-preview");
+        const node = getNode(state.viewed) || getNode(state.current);
+        const images = imagesForNode(node);
+        if (!panel) return;
+        if (!node || !images.length || window.matchMedia("(max-width: 700px)").matches || dismissedCanvasImageFor === node.id) {
+          panel.hidden = true;
+          panel.innerHTML = "";
+          return;
+        }
+        if (canvasImageNodeId !== node.id) {
+          canvasImageNodeId = node.id;
+          canvasImageIndex = 0;
+        }
+        canvasImageIndex = Math.max(0, Math.min(images.length - 1, canvasImageIndex));
+        const item = images[canvasImageIndex];
+        const products = Array.isArray(node.product) ? node.product : [node.product];
+        panel.dataset.products = products.map(productToken).filter(Boolean).join(" ");
+        panel.innerHTML =
+          '<div class="canvas-image-preview-head"><div><p class="canvas-image-preview-kicker">Скриншот на полотне</p><h3 class="canvas-image-preview-title">' + escapeHTML(node.title) + '</h3></div><button class="canvas-image-close" type="button" data-canvas-image-close aria-label="Закрыть скриншоты">×</button></div>' +
+          '<div class="canvas-image-pagination"><span>Изображение ' + (canvasImageIndex + 1) + ' из ' + images.length + '</span><div class="canvas-image-controls"><button class="canvas-image-control" type="button" data-canvas-image-step="-1" aria-label="Предыдущее изображение"' + (canvasImageIndex === 0 ? " disabled" : "") + '>‹</button><button class="canvas-image-control" type="button" data-canvas-image-step="1" aria-label="Следующее изображение"' + (canvasImageIndex === images.length - 1 ? " disabled" : "") + '>›</button></div></div>' +
+          '<a class="canvas-image-main" href="' + escapeHTML(item.src) + '" target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение полностью: ' + escapeHTML(item.caption) + '"><img src="' + escapeHTML(item.src) + '" alt="' + escapeHTML(item.alt) + '"></a>' +
+          '<p class="canvas-image-caption">' + escapeHTML(item.caption) + '</p>' +
+          (images.length > 1 ? '<div class="canvas-image-thumbnails" aria-label="Выбрать скриншот">' + images.map((image, index) => '<button class="canvas-image-thumb" type="button" data-canvas-image-index="' + index + '" aria-label="Показать скриншот ' + (index + 1) + ': ' + escapeHTML(image.caption) + '" aria-pressed="' + String(index === canvasImageIndex) + '"><img src="' + escapeHTML(image.src) + '" alt="" loading="lazy"></button>').join("") + '</div>' : "");
+        panel.hidden = false;
+        panel.querySelector("[data-canvas-image-close]").addEventListener("click", closeCanvasImagePreview);
+        panel.querySelectorAll("[data-canvas-image-step]").forEach((button) => button.addEventListener("click", () => {
+          canvasImageIndex = Math.max(0, Math.min(images.length - 1, canvasImageIndex + Number(button.dataset.canvasImageStep)));
+          renderCanvasImagePreview();
+        }));
+        panel.querySelectorAll("[data-canvas-image-index]").forEach((button) => button.addEventListener("click", () => {
+          canvasImageIndex = Number(button.dataset.canvasImageIndex);
+          renderCanvasImagePreview();
+        }));
+        const mainImage = panel.querySelector(".canvas-image-main img");
+        mainImage.addEventListener("load", () => positionCanvasImagePreview(node), { once: true });
+        requestAnimationFrame(() => positionCanvasImagePreview(node));
+      }
+
+      function renderSetupRoutes(node) {
+        const keys = routeValues();
+        if (!keys.length) return '<section class="detail-section"><div class="flag-card gap"><div class="flag-title">Нет выбранного продуктового маршрута</div><p class="flag-text">Вернитесь к развилке услуг и выберите SMS или подходящую ветку WhatsApp.</p></div></section>';
+        return keys.map((key) => {
+          const route = node.setupRoutes[key];
+          if (!route) return "";
+          const groups = [{ title: "Действия по " + route.product, items: route.steps }];
+          const flags = route.flags || [];
+          return '<section class="setup-route ' + key + '"><h3 class="setup-route-title">' + escapeHTML(route.product) + (keys.length > 1 ? " · отдельная ветка" : "") + "</h3>" +
+            '<p class="setup-route-note"><strong>Заметка менеджеру.</strong> ' + escapeHTML(route.managerNote || "Пройдите этот маршрут по порядку и сверяйте действующие условия перед обещанием клиенту.") + '</p>' +
+            renderChecklists(node, groups, "setup-" + key) +
+            (route.scripts && route.scripts.length ? '<div class="detail-section"><h4 class="detail-section-title">Текст клиенту</h4>' + route.scripts.map((script, index) => renderScript(script, "route-" + key + "-" + index)).join("") + "</div>" : "") +
+            flags.map(renderFlag).join("") + renderLinks(route.links) + "</section>";
+        }).join("");
+      }
+
+      function renderNodeContent(node) {
+        const parts = [];
+        if (node.managerNote) parts.push('<section class="detail-section"><div class="manager-note-card"><h3 class="manager-note-title">Заметка менеджеру</h3><p class="manager-note-text">' + escapeHTML(node.managerNote) + "</p></div></section>");
+        (node.flags || []).forEach((flag) => parts.push(renderFlag(flag)));
+        if (node.options && node.options.length) {
+          const selected = state.choices[node.id];
+          parts.push('<section class="detail-section"><h3 class="detail-section-title">Выберите продолжение</h3>' +
+            (node.id !== state.current ? '<p class="option-note">Вы просматриваете развилку. Выбор варианта обновит текущий маршрут.</p>' : "") +
+            '<div class="option-list">' + node.options.map((option, index) => {
+              const isSelected = selected && selected.index === index;
+              const optionStyle = option.product === "SMS" ? ' data-option-product="sms"' : "";
+              return '<button class="option-button' + (isSelected ? " is-selected" : "") + '" type="button" data-option-index="' + index + '"' + optionStyle + '><span>' + escapeHTML(option.label) + '</span><span class="option-arrow" aria-hidden="true">→</span></button>';
+            }).join("") + "</div></section>");
+        }
+        if (node.content) {
+          node.content.forEach((part) => {
+            if (part.kind === "text") parts.push('<section class="detail-section"><p class="detail-paragraph">' + escapeHTML(part.text) + "</p></section>");
+            if (part.kind === "script") parts.push(renderScript(part, "content-" + parts.length));
+            if (part.kind === "link") parts.push('<section class="detail-section">' + renderLinks([part.link]) + "</section>");
+          });
+        }
+        if (node.scripts) parts.push('<section class="detail-section"><h3 class="detail-section-title">Готовый текст для клиента</h3><p class="detail-paragraph">Замените поля в квадратных скобках, затем нажмите «Скопировать» и отправьте сообщение.</p>' + node.scripts.map((script, index) => renderScript(script, index)).join("") + "</section>");
+        const nodeImages = imagesForNode(node);
+        if (nodeImages.length) parts.push(renderNodeImageAccess(node, nodeImages));
+        if (node.questions) parts.push(renderQuestions(node));
+        if (node.checklists) parts.push(renderChecklists(node, node.checklists, "checklist"));
+        if (node.links) parts.push('<section class="detail-section"><h3 class="detail-section-title">Ссылки и материалы по шагу</h3>' + renderLinks(node.links) + "</section>");
+        if (node.setupRoutes) parts.push('<section class="detail-section"><h3 class="detail-section-title">Выбранная продуктовая ветка</h3><p class="detail-paragraph">Для каналов «SMS и WhatsApp» выполните обе процедуры. Отметки позволяют вести чек-листы, но не записывают ответы клиента.</p>' + renderSetupRoutes(node) + "</section>");
+        if (node.crmFields) {
+          parts.push('<section class="detail-section"><h3 class="detail-section-title">Шаблон заметки менеджера в CRM</h3><div class="crm-card"><div class="crm-lines">' + node.crmFields.map((field) => "<span>" + escapeHTML(field) + "</span>").join("") + '</div></div><p class="detail-paragraph" style="margin-top:8px">Не записывайте пароли, коды подтверждения или лишние персональные данные.</p></section>');
+        }
+        return parts.join("");
+      }
+
+      function renderDetails() {
+        const node = getNode(state.viewed) || getNode(state.current);
+        if (!node) return;
+        state.viewed = node.id;
+        const current = node.id === state.current;
+        const products = Array.isArray(node.product) ? node.product : [node.product];
+        const productTokens = products.map(productToken).filter((token, index, tokens) => token && tokens.indexOf(token) === index);
+        document.getElementById("detail-panel").dataset.products = productTokens.join(" ");
+        const done = state.done.includes(node.id) || (!current && state.path.lastIndexOf(node.id) < state.path.lastIndexOf(state.current) && state.path.includes(node.id));
+        const productLabel = products.filter(Boolean).join(" + ");
+        document.getElementById("detail-kicker").textContent = (productLabel ? productLabel + " · " : "") + (current ? "Текущий узел" : "Просмотр узла · маршрут не изменён");
+        document.getElementById("detail-title").textContent = node.title;
+        document.getElementById("detail-summary").textContent = node.summary || "";
+        const stateLabel = current ? "● Вы здесь" : done ? "✓ Пройдено" : node.type === "GAP" ? "Пробел в базе знаний" : "Просмотр";
+        const stateClass = current ? "current" : done ? "done" : "";
+        const step = node.step ? "Шаг " + node.step + " из 6" : "";
+        const sourceBadge = node.source && node.source.status ? '<span class="source-badge">' + escapeHTML(node.source.status) + "</span>" : "";
+        document.getElementById("detail-scroll").innerHTML =
+          '<div class="detail-state ' + stateClass + '">' + escapeHTML(stateLabel) + (step ? " · " + step : "") + "</div>" +
+          sourceBadge + renderNodeContent(node) +
+          (node.source ? '<div class="detail-source">Источник: <a href="' + escapeHTML(node.source.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHTML(node.source.label) + " ↗</a></div>" : "");
+        document.getElementById("detail-scroll").querySelectorAll("[data-open-canvas-images]").forEach((button) => button.addEventListener("click", () => {
+          dismissedCanvasImageFor = "";
+          canvasImageNodeId = "";
+          centerOnNode(state.viewed);
+          renderCanvasImagePreview();
+        }));
+        const footer = document.getElementById("detail-footer");
+        if (current && node.type === "END") {
+          footer.innerHTML = '<span class="footer-hint">Тупиков нет: консультация завершена явным итогом.</span><button class="done-button end" id="done-button" type="button">Новая консультация <span aria-hidden="true">↺</span></button>';
+          document.getElementById("done-button").addEventListener("click", resetJourney);
+        } else if (current && node.next) {
+          const label = node.type === "START" ? "Начать" : node.type === "HANDOFF" ? "Зафиксировано · продолжить" : node.type === "GAP" ? "Зафиксировать пробел" : node.type === "GATE" ? "Понял · продолжить" : "Сделано · дальше";
+          const hint = node.type === "GATE" ? "Проверьте предупреждение перед переходом." : node.type === "HANDOFF" ? "Передача отмечена. Продолжайте по указанному маршруту." : "Текущая позиция изменится после отметки «Сделано».";
+          footer.innerHTML = '<span class="footer-hint">' + escapeHTML(hint) + '</span><button class="done-button" id="done-button" type="button">' + escapeHTML(label) + ' <span aria-hidden="true">→</span></button>';
+          document.getElementById("done-button").addEventListener("click", markDone);
+        } else if (current && node.type === "END") {
+          footer.innerHTML = '<span class="footer-hint">Конец этой ветки. Можно начать новую консультацию.</span>';
+        } else {
+          footer.innerHTML = '<span class="footer-hint">Текущая позиция не изменится при просмотре.</span>';
+        }
+        bindDetailEvents(node);
+      }
+
+      function bindDetailEvents(node) {
+        document.querySelectorAll("[data-option-index]").forEach((button) => {
+          button.addEventListener("click", () => chooseOption(node.id, Number(button.dataset.optionIndex)));
+        });
+        document.querySelectorAll("[data-check-key]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const key = button.dataset.checkKey;
+            const checked = button.getAttribute("aria-pressed") !== "true";
+            button.setAttribute("aria-pressed", String(checked));
+            button.setAttribute("aria-checked", String(checked));
+            button.querySelector(".check-box").textContent = checked ? "✓" : "";
+            updateCheck(key, checked);
+          });
+        });
+        document.querySelectorAll("[data-question-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const checked = button.getAttribute("aria-pressed") !== "true";
+            button.setAttribute("aria-pressed", String(checked));
+            updateQuestion(node.id, button.dataset.questionId, checked);
+          });
+        });
+        document.querySelectorAll("[data-copy-text]").forEach((button) => {
+          button.addEventListener("click", () => copyText(button.dataset.copyText || ""));
+        });
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderTree();
+        renderDetails();
+      }
+
+      function openDetails() {
+        document.getElementById("detail-panel").classList.add("is-open");
+        document.getElementById("detail-panel").classList.remove("is-closed");
+        document.querySelector(".workspace").classList.remove("details-closed");
+        document.getElementById("mobile-scrim").hidden = false;
+      }
+      function closeDetails() {
+        document.getElementById("detail-panel").classList.remove("is-open");
+        document.getElementById("detail-panel").classList.add("is-closed");
+        document.querySelector(".workspace").classList.add("details-closed");
+        document.getElementById("mobile-scrim").hidden = true;
+      }
+
+      function renderSources() {
+        const sourceItems = Object.keys(DATA.sources).map((key) => DATA.sources[key]);
+        const otherLinks = Object.keys(DATA.links).map((key) => DATA.links[key]);
+        document.getElementById("sources-content").innerHTML =
+          '<div class="drawer-group"><h3>Основные страницы Notion</h3>' +
+          sourceItems.map((source) => '<a class="drawer-source" href="' + escapeHTML(source.url) + '" target="_blank" rel="noopener noreferrer"><strong>' + escapeHTML(source.label) + ' ↗</strong><em>' + escapeHTML(source.status) + '</em></a>').join("") +
+          '</div><div class="drawer-note"><strong>Материал для скриптов отмечен «На проверке».</strong> Тарифы, условия тестирования, Meta и спорные описания FlowZap показаны в соответствующих узлах бейджем «Требует проверки».</div>' +
+          '<div class="drawer-group" style="margin-top:18px"><h3>Доски, кабинеты и внутренние ссылки</h3>' +
+          otherLinks.map((link) => '<a class="drawer-source" href="' + escapeHTML(link.url) + '" target="_blank" rel="noopener noreferrer"><strong>' + escapeHTML(link.label) + ' ↗</strong><span>' + escapeHTML(link.url.replace("https://", "").replace("http://", "")) + '</span></a>').join("") +
+          '</div><div class="drawer-note">Эта страница хранит в localStorage только отметки чек-листов, выбранные ветки и позицию алгоритма. Текст клиента и персональные данные не запрашиваются и не сохраняются.</div>';
+      }
+
+      function openSources() {
+        document.getElementById("sources-backdrop").hidden = false;
+        document.getElementById("sources-close").focus();
+      }
+      function closeSources() {
+        document.getElementById("sources-backdrop").hidden = true;
+        document.getElementById("sources-button").focus();
+      }
+
+      document.getElementById("back-button").addEventListener("click", goBack);
+      document.getElementById("current-button").addEventListener("click", goCurrent);
+      document.getElementById("reset-button").addEventListener("click", resetJourney);
+      document.getElementById("show-all-button").addEventListener("click", () => {
+        state.showAll = !state.showAll;
+        renderTree();
+        showToast(state.showAll ? "Показано всё дерево" : "Показан текущий маршрут");
+      });
+      document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(MAX_ZOOM, zoom + .1); renderTree(); });
+      document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(MIN_ZOOM, zoom - .1); renderTree(); });
+      document.getElementById("zoom-fit").addEventListener("click", () => { zoom = 1; renderTree(); });
+      document.getElementById("detail-close").addEventListener("click", closeDetails);
+      document.getElementById("tree-viewport").addEventListener("scroll", () => positionCanvasImagePreview(getNode(state.viewed)), { passive: true });
+      window.addEventListener("resize", renderAll);
+      document.getElementById("mobile-scrim").addEventListener("click", closeDetails);
+      document.getElementById("sources-button").addEventListener("click", openSources);
+      document.getElementById("sources-close").addEventListener("click", closeSources);
+      document.getElementById("sources-backdrop").addEventListener("click", (event) => {
+        if (event.target.id === "sources-backdrop") closeSources();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          if (!document.getElementById("sources-backdrop").hidden) closeSources();
+          else if (!document.getElementById("canvas-image-preview").hidden) closeCanvasImagePreview();
+          else if (!document.getElementById("detail-panel").classList.contains("is-closed")) closeDetails();
+        }
+      });
+      window.addEventListener("hashchange", () => {
+        const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+        if (nodeById.has(id) && state.path.includes(id)) {
+          state.current = id;
+          state.viewed = id;
+          persist();
+          renderAll();
+          centerOnNode(id);
+        }
+      });
+
+      renderSources();
+      validateTree();
+      renderAll();
+      if (window.matchMedia("(max-width: 700px)").matches) openDetails();
+      if (state.current) {
+        history.replaceState(null, "", location.pathname + location.search + "#" + encodeURIComponent(state.current));
+        centerOnNode(state.current);
+      }
+    })();
+  </script>
+</body>
+</html>
